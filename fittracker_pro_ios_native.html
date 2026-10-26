@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FitTracker Pro Native</title>
+    <!-- Tailwind CSS (Inclus en version standalone pour compatibilité mobile) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0F172A',
+                        cardbg: '#1E293B',
+                        accent: '#3B82F6',
+                        accenthover: '#2563EB',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Icons FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans pb-24">
+
+    <!-- HEADER iOS COMPATIBLE NOTCH -->
+    <header class="bg-cardbg/95 backdrop-blur border-b border-slate-700/50 sticky top-0 z-30 px-4 py-3 pt-8">
+        <div class="max-w-xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2" id="header-left">
+                <i class="fa-solid fa-dumbbell text-accent text-xl"></i>
+                <div>
+                    <h1 class="font-bold text-lg text-white tracking-wide leading-none">FitTracker <span class="text-xs text-accent font-semibold px-2 py-0.5 rounded bg-accent/10 border border-accent/20">PRO iOS</span></h1>
+                    <span id="wake-status" class="text-[9px] text-slate-400 flex items-center gap-1 mt-0.5">
+                        <i class="fa-solid fa-moon text-slate-500"></i> Veille normale
+                    </span>
+                </div>
+            </div>
+            <div id="header-right" class="hidden items-center gap-3">
+                <div class="flex items-center gap-1.5 bg-slate-900/80 border border-slate-700/60 rounded-full px-3 py-1 text-xs font-mono text-slate-300">
+                    <i class="fa-regular fa-clock text-accent"></i>
+                    <span id="global-timer">00:00:00</span>
+                </div>
+                <button onclick="requestQuitWorkout()" class="text-xs font-semibold text-slate-400 hover:text-danger bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
+                    Quitter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 pt-4">
+
+        <!-- DASHBOARD (SÉLECTION DES WORKOUTS) -->
+        <div id="screen-dashboard" class="space-y-6">
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-center">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Programme 100% Machines</p>
+                <h2 class="text-xl font-bold text-white mt-1">Sélectionnez votre séance du jour</h2>
+                <p class="text-xs text-slate-400 mt-1">Application Native • IndexedDB • Standalone iOS</p>
+            </div>
+
+            <div class="grid gap-4">
+                <!-- SÉANCE 1 -->
+                <button onclick="startWorkout(0)" class="bg-cardbg border border-slate-700 hover:border-accent transition-all rounded-2xl p-4 text-left flex items-center gap-4 group shadow-lg">
+                    <div class="w-14 h-14 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center text-accent text-2xl group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-child-reaching"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-base text-white group-hover:text-accent transition-colors">Haut du Corps</h3>
+                            <span class="text-[10px] uppercase font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full border border-accent/20">Épaules, Dos & Pecs</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">10 min Rameur + Mobilité + 5 Machines</p>
+                        <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
+                            <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>~1h15</span>
+                            <span><i class="fa-solid fa-layer-group mr-1 text-slate-500"></i>5 exos</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-accent transition-colors"></i>
+                </button>
+
+                <!-- SÉANCE 2 -->
+                <button onclick="startWorkout(1)" class="bg-cardbg border border-slate-700 hover:border-accent transition-all rounded-2xl p-4 text-left flex items-center gap-4 group shadow-lg">
+                    <div class="w-14 h-14 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center text-accent text-2xl group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-hand-fist"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-base text-white group-hover:text-accent transition-colors">Bras, Abdos & Lombaires</h3>
+                            <span class="text-[10px] uppercase font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full border border-accent/20">Biceps, Triceps, Core</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">10 min Rameur + Mobilité + 5 Exercices</p>
+                        <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
+                            <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>~1h15</span>
+                            <span><i class="fa-solid fa-layer-group mr-1 text-slate-500"></i>5 exos</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-accent transition-colors"></i>
+                </button>
+
+                <!-- SÉANCE 3 -->
+                <button onclick="startWorkout(2)" class="bg-cardbg border border-slate-700 hover:border-accent transition-all rounded-2xl p-4 text-left flex items-center gap-4 group shadow-lg">
+                    <div class="w-14 h-14 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center text-accent text-2xl group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-person-running"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-base text-white group-hover:text-accent transition-colors">Bas du Corps</h3>
+                            <span class="text-[10px] uppercase font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full border border-accent/20">Cuisses & Fessiers</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">10 min Vélo + Mobilité + 5 Machines</p>
+                        <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
+                            <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>~1h20</span>
+                            <span><i class="fa-solid fa-layer-group mr-1 text-slate-500"></i>5 exos</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-accent transition-colors"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ECRAN WORKOUT ACTIF -->
+        <div id="screen-workout" class="hidden space-y-6">
+
+            <!-- MINUTEUR CARDIO -->
+            <div id="warmup-card" class="bg-gradient-to-br from-cardbg to-slate-800 border border-accent/40 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-accent uppercase tracking-wider bg-accent/10 px-2 py-0.5 rounded border border-accent/20">Étape 1 • Cardio</span>
+                        <h3 id="warmup-title" class="font-bold text-lg text-white mt-1">10 min Cardio</h3>
+                    </div>
+                    <div class="text-2xl text-accent"><i id="warmup-icon" class="fa-solid fa-water-ladder"></i></div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between bg-slate-900/80 rounded-xl p-3 border border-slate-700/60">
+                    <div class="font-mono text-3xl font-bold text-white tracking-widest" id="warmup-timer-display">10:00</div>
+                    <div class="flex items-center gap-2">
+                        <button id="warmup-start-btn" onclick="toggleWarmupTimer()" class="bg-accent hover:bg-accenthover text-white px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-play"></i> Démarrer
+                        </button>
+                        <button onclick="resetWarmupTimer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold border border-slate-700">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOBILISATION ARTICULAIRE -->
+            <div id="articular-card" class="bg-cardbg border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-bone text-warning text-sm"></i>
+                        <h4 class="font-bold text-sm text-white">Étape 2 • Échauffement Articulaire (2 min)</h4>
+                    </div>
+                    <span class="text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded border border-warning/20 font-semibold">Mobilisation</span>
+                </div>
+                <div id="articular-list" class="grid grid-cols-2 gap-2 text-xs"></div>
+            </div>
+
+            <!-- EXERCICES DU PROGRAMME -->
+            <div id="exercises-container" class="space-y-6"></div>
+
+            <div class="pt-4">
+                <button onclick="requestFinishWorkout()" class="w-full bg-success hover:bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wide">
+                    <i class="fa-solid fa-circle-check text-base"></i> Terminer la séance
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- MINUTEUR REPOS FLOTTANT -->
+    <div id="rest-timer-bar" class="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-accent/40 backdrop-blur-md p-3 z-40 transform translate-y-full transition-transform duration-300">
+        <div class="max-w-xl mx-auto flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center text-accent">
+                    <i class="fa-solid fa-stopwatch text-lg"></i>
+                </div>
+                <div>
+                    <div class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Repos (Silencieux)</div>
+                    <div id="rest-timer-display" class="text-2xl font-mono font-bold text-white">01:30</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="adjustRestTimer(-15)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700">-15s</button>
+                <button onclick="adjustRestTimer(15)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700">+15s</button>
+                <button onclick="stopRestTimer()" class="bg-accent hover:bg-accenthover text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Passer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE MODERNE -->
+    <div id="custom-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 text-center">
+            <div id="modal-icon-container" class="w-12 h-12 rounded-full bg-accent/10 border border-accent/30 mx-auto flex items-center justify-center text-accent text-xl">
+                <i id="modal-icon" class="fa-solid fa-info"></i>
+            </div>
+            <h3 id="modal-title" class="font-bold text-lg text-white">Titre</h3>
+            <p id="modal-message" class="text-xs text-slate-300 leading-relaxed">Message...</p>
+            <div id="modal-actions" class="flex items-center justify-center gap-3 pt-2"></div>
+        </div>
+    </div>
+
+    <!-- MOTEUR INDEXEDDB ET LOGIQUE APPLI -->
+    <script>
+        // INIT DB INDEXEDDB POUR IOS
+        let db;
+        const request = indexedDB.open("FitTrackerDB", 1);
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("workout_logs")) {
+                db.createObjectStore("workout_logs", { keyPath: "id" });
+            }
+        };
+        request.onsuccess = (e) => { db = e.target.result; };
+
+        async function dbSet(key, val) {
+            if (!db) return localStorage.setItem(key, JSON.stringify(val));
+            const tx = db.transaction("workout_logs", "readwrite");
+            tx.objectStore("workout_logs").put({ id: key, value: val });
+        }
+
+        async function dbGet(key) {
+            if (!db) {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : null;
+            }
+            return new Promise((resolve) => {
+                const tx = db.transaction("workout_logs", "readonly");
+                const req = tx.objectStore("workout_logs").get(key);
+                req.onsuccess = () => resolve(req.result ? req.result.value : null);
+                req.onerror = () => resolve(null);
+            });
+        }
+
+        const workouts = [
+            {
+                title: "Haut du Corps (Épaules, Dos & Pecs)",
+                warmup: "10 min Rameur",
+                warmupIcon: "fa-solid fa-water-ladder",
+                articular: [
+                    "15x Rotations d'épaules (avant/arrière)",
+                    "12x Rotateurs de la coiffe (bras 90°)",
+                    "10x Moulinets légers de bras",
+                    "10x Flexions/Extensions des poignets"
+                ],
+                exercises: [
+                    { name: "Tirage Vertical Poitrine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/11/tirage-vertical-poitrine.gif", desc: "Assis, calez les cuisses. Saisissez la barre prise large, tirez vers la poitrine." },
+                    { name: "Rowing Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif", desc: "Buste droit appuyé, tirez vers le nombril en resserrant les omoplates." },
+                    { name: "Développé Épaules à la Machine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif", desc: "Poignées au niveau des épaules. Poussez vers le haut sans verrouiller brusquement." },
+                    { name: "Élévation Latérale Poulie Inclinée", sets: 3, reps: "12-15 reps", restSec: 60, image: "https://www.docteur-fitness.com/wp-content/uploads/2025/11/elevation-laterale-a-la-poulie-en-inclinaison.gif", desc: "Buste incliné, montez la poignée latéralement jusqu'à l'épaule." },
+                    { name: "Pectoral Machine (Pec Deck)", sets: 3, reps: "12-15 reps", restSec: 60, image: "https://i.pinimg.com/originals/a2/12/cd/a212cde8804175ee82be3abe83ca51e3.gif", desc: "Assis le dos plaqué, resserrez les bras devant vous en contractant le torse." }
+                ]
+            },
+            {
+                title: "Bras, Abdos & Lombaires",
+                warmup: "10 min Rameur",
+                warmupIcon: "fa-solid fa-water-ladder",
+                articular: [
+                    "15x Rotations légères des poignets",
+                    "12x Extensions/Flexions des coudes",
+                    "10x Torsions contrôlées du buste",
+                    "10x Flexions latérales du buste"
+                ],
+                exercises: [
+                    { name: "Machine Dips Assistée", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/dips-assis-machine-matrix.gif", desc: "Fléchissez les coudes à 90° puis poussez fort pour cibler les triceps." },
+                    { name: "Extension Triceps Poulie Corde", sets: 4, reps: "12-15 reps", restSec: 75, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/extension-triceps-poulie-haute-corde.gif", desc: "Coudes fixes aux côtes, poussez la corde vers le bas en écartant les poignées." },
+                    { name: "Curl Biceps Assis Machine", sets: 4, reps: "10-12 reps", restSec: 75, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-pupitre-machine-prechargee.gif", desc: "Coudes calés sur le pupitre, fléchissez les bras pour isoler les biceps." },
+                    { name: "Crunch à la Machine", sets: 4, reps: "15-20 reps", restSec: 60, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/crunch-machine-abdos.gif", desc: "Saisissez les poignées et enroulez le buste vers le bas en gainant les abdos." },
+                    { name: "Extension Lombaire Banc 45°", sets: 3, reps: "12-15 reps", restSec: 60, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/extension-lombaire-au-banc-45.gif", desc: "Bassin calé, descendez puis remontez jusqu'à l'alignement du corps." }
+                ]
+            },
+            {
+                title: "Bas du Corps (Cuisses & Fessiers)",
+                warmup: "10 min Vélo",
+                warmupIcon: "fa-solid fa-person-biking",
+                articular: [
+                    "15x Balancements de jambe",
+                    "12x Rotations des chevilles",
+                    "10x Flexions à vide (Squat)",
+                    "10x Ouvertures de hanches"
+                ],
+                exercises: [
+                    { name: "Presse à Cuisses Inclinée", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif", desc: "Pieds sur le plateau, poussez par les talons sans bloquer les genoux." },
+                    { name: "Leg Extension (Quadriceps)", sets: 4, reps: "12-15 reps", restSec: 75, image: "https://i.pinimg.com/originals/2f/88/8a/2f888a80d3e49f5e31ee372116437540.gif", desc: "Tendez les jambes vers le haut en bloquant 1 sec la contraction." },
+                    { name: "Leg Curl Assis (Ischios)", sets: 4, reps: "12-15 reps", restSec: 75, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/leg-curl-assis-machine.gif", desc: "Fléchissez les genoux pour ramener le boudin sous le siège de façon fluide." },
+                    { name: "Machine Hip Thrust (Fessiers)", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/hip-thrust-machine-leg-extension.gif", desc: "Poussez le bassin vers le haut en contractant fort les fessiers en haut." },
+                    { name: "Machine Abducteurs", sets: 4, reps: "15-20 reps", restSec: 60, image: "https://i.pinimg.com/originals/a0/85/b9/a085b9cee9496d9f0c9e9aa733479bfb.gif", desc: "Écartez les cuisses contre les coussins pour isoler le moyen fessier." }
+                ]
+            }
+        ];
+
+        let activeWorkoutIndex = null;
+        let globalTimerInterval = null;
+        let globalSeconds = 0;
+        let warmupTimerInterval = null;
+        let warmupSecondsLeft = 600;
+        let restTimerInterval = null;
+        let restSecondsLeft = 0;
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    updateWakeStatus(true);
+                }
+            } catch (err) {
+                updateWakeStatus(false);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+                updateWakeStatus(false);
+            }
+        }
+
+        function updateWakeStatus(active) {
+            const el = document.getElementById('wake-status');
+            if (active) {
+                el.innerHTML = '<i class="fa-solid fa-sun text-amber-400"></i> Écran maintenu allumé';
+                el.className = 'text-[9px] text-amber-400 flex items-center gap-1 mt-0.5 font-semibold';
+            } else {
+                el.innerHTML = '<i class="fa-solid fa-moon text-slate-500"></i> Veille normale';
+                el.className = 'text-[9px] text-slate-400 flex items-center gap-1 mt-0.5';
+            }
+        }
+
+        function showModal(title, message, iconClass, buttons) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-icon').className = iconClass;
+            const actionsDiv = document.getElementById('modal-actions');
+            actionsDiv.innerHTML = '';
+            buttons.forEach(btn => {
+                const buttonEl = document.createElement('button');
+                buttonEl.textContent = btn.label;
+                buttonEl.className = btn.class || "bg-accent text-white px-4 py-2 rounded-lg text-xs font-bold";
+                buttonEl.onclick = () => { closeModal(); if (btn.action) btn.action(); };
+                actionsDiv.appendChild(buttonEl);
+            });
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        async function startWorkout(index) {
+            activeWorkoutIndex = index;
+            const workout = workouts[index];
+
+            document.getElementById('screen-dashboard').classList.add('hidden');
+            document.getElementById('screen-workout').classList.remove('hidden');
+            document.getElementById('header-right').classList.remove('hidden');
+            document.getElementById('header-right').classList.add('flex');
+
+            document.getElementById('warmup-title').textContent = workout.warmup;
+            document.getElementById('warmup-icon').className = workout.warmupIcon;
+
+            document.getElementById('articular-list').innerHTML = workout.articular.map(item => `
+                <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2 text-slate-300">
+                    <i class="fa-solid fa-angle-right text-warning text-[10px]"></i>
+                    <span>${item}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('exercises-container').innerHTML = workout.exercises.map((ex, exIdx) => renderExerciseCard(ex, exIdx)).join('');
+
+            await loadSavedWeights();
+            startGlobalTimer();
+            await requestWakeLock();
+        }
+
+        function renderExerciseCard(ex, exIdx) {
+            let setsRows = '';
+            for (let s = 1; s <= ex.sets; s++) {
+                setsRows += `
+                    <div class="flex flex-col gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-400 w-12">Série ${s}</span>
+                                <span class="text-[10px] text-slate-500 font-mono bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700/60">
+                                    Précédent: <strong id="prev_${exIdx}_${s}" class="text-slate-300">-- kg</strong>
+                                </span>
+                            </div>
+                            <span class="text-xs font-medium text-slate-300">${ex.reps}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
+                            <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                                <input type="number" step="2.5" placeholder="0" id="w_${exIdx}_${s}" onchange="saveWeight(${exIdx}, ${s}, this.value)" class="w-12 bg-transparent text-center font-bold text-sm text-accent focus:outline-none">
+                                <span class="text-[10px] text-slate-400 font-semibold">kg</span>
+                            </div>
+
+                            <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                                <span class="text-[10px] text-slate-400 font-bold">RPE</span>
+                                <select id="rpe_${exIdx}_${s}" onchange="saveRPE(${exIdx}, ${s}, this.value)" class="bg-transparent text-xs text-warning font-bold focus:outline-none cursor-pointer">
+                                    <option value="" class="bg-slate-900 text-slate-400">-</option>
+                                    <option value="6" class="bg-slate-900 text-emerald-400">6 (Facile)</option>
+                                    <option value="7" class="bg-slate-900 text-emerald-400">7 (Modéré)</option>
+                                    <option value="8" class="bg-slate-900 text-warning">8 (Bon effort)</option>
+                                    <option value="9" class="bg-slate-900 text-amber-500">9 (Très dur)</option>
+                                    <option value="10" class="bg-slate-900 text-danger">10 (Échec)</option>
+                                </select>
+                            </div>
+
+                            <button onclick="completeSet(this, ${ex.restSec})" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 hover:text-success border border-slate-700 flex items-center justify-center transition-colors">
+                                <i class="fa-solid fa-check text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="bg-cardbg border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl">
+                    <div class="h-52 bg-slate-900 relative">
+                        <img src="${ex.image}" alt="${ex.name}" class="w-full h-full object-cover opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-cardbg via-transparent to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 right-4">
+                            <span class="text-[10px] uppercase font-bold text-accent bg-accent/20 px-2 py-0.5 rounded border border-accent/30 backdrop-blur-sm">Machine / Poulie</span>
+                            <h4 class="font-bold text-base text-white mt-1 drop-shadow-md">${ex.name}</h4>
+                        </div>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <p class="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-2.5 rounded-xl border border-slate-800">${ex.desc}</p>
+                        <div class="space-y-2">${setsRows}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGlobalTimer() {
+            globalSeconds = 0;
+            clearInterval(globalTimerInterval);
+            globalTimerInterval = setInterval(() => {
+                globalSeconds++;
+                const hrs = Math.floor(globalSeconds / 3600);
+                const mins = Math.floor((globalSeconds % 3600) / 60);
+                const secs = globalSeconds % 60;
+                document.getElementById('global-timer').textContent = 
+                    `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function toggleWarmupTimer() {
+            const btn = document.getElementById('warmup-start-btn');
+            if (warmupTimerInterval) {
+                clearInterval(warmupTimerInterval);
+                warmupTimerInterval = null;
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> Reprendre';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+                warmupTimerInterval = setInterval(() => {
+                    if (warmupSecondsLeft > 0) {
+                        warmupSecondsLeft--;
+                        updateWarmupDisplay();
+                    } else {
+                        clearInterval(warmupTimerInterval);
+                        warmupTimerInterval = null;
+                        showModal("Échauffement terminé !", "Passez à la mobilisation articulaire.", "fa-solid fa-circle-check text-success", [{ label: "Compris !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold" }]);
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetWarmupTimer() {
+            clearInterval(warmupTimerInterval);
+            warmupTimerInterval = null;
+            warmupSecondsLeft = 600;
+            updateWarmupDisplay();
+            document.getElementById('warmup-start-btn').innerHTML = '<i class="fa-solid fa-play"></i> Démarrer';
+        }
+
+        function updateWarmupDisplay() {
+            const m = Math.floor(warmupSecondsLeft / 60);
+            const s = warmupSecondsLeft % 60;
+            document.getElementById('warmup-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function completeSet(btn, restSec) {
+            btn.classList.toggle('bg-success');
+            btn.classList.toggle('text-white');
+            btn.classList.toggle('border-success');
+            if (btn.classList.contains('bg-success')) {
+                startRestTimer(restSec);
+            }
+        }
+
+        function startRestTimer(seconds) {
+            restSecondsLeft = seconds;
+            updateRestDisplay();
+            document.getElementById('rest-timer-bar').classList.remove('translate-y-full');
+            clearInterval(restTimerInterval);
+            restTimerInterval = setInterval(() => {
+                if (restSecondsLeft > 0) {
+                    restSecondsLeft--;
+                    updateRestDisplay();
+                } else {
+                    stopRestTimer();
+                }
+            }, 1000);
+        }
+
+        function adjustRestTimer(amount) {
+            restSecondsLeft = Math.max(0, restSecondsLeft + amount);
+            updateRestDisplay();
+        }
+
+        function stopRestTimer() {
+            clearInterval(restTimerInterval);
+            restTimerInterval = null;
+            document.getElementById('rest-timer-bar').classList.add('translate-y-full');
+        }
+
+        function updateRestDisplay() {
+            const m = Math.floor(restSecondsLeft / 60);
+            const s = restSecondsLeft % 60;
+            document.getElementById('rest-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        async function saveWeight(exIdx, setNum, value) {
+            const currentKey = `curr_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${setNum}`;
+            const prevKey = `prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${setNum}`;
+            const oldCurrent = await dbGet(currentKey);
+            if (oldCurrent && oldCurrent !== value) {
+                await dbSet(prevKey, oldCurrent);
+            }
+            await dbSet(currentKey, value);
+        }
+
+        async function saveRPE(exIdx, setNum, value) {
+            await dbSet(`rpe_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${setNum}`, value);
+        }
+
+        async function loadSavedWeights() {
+            const workout = workouts[activeWorkoutIndex];
+            for (let exIdx = 0; exIdx < workout.exercises.length; exIdx++) {
+                const ex = workout.exercises[exIdx];
+                for (let s = 1; s <= ex.sets; s++) {
+                    const prevWeight = await dbGet(`prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`);
+                    if (prevWeight) {
+                        const prevEl = document.getElementById(`prev_${exIdx}_${s}`);
+                        if (prevEl) prevEl.textContent = `${prevWeight} kg`;
+                    }
+                    const savedWeight = await dbGet(`curr_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`);
+                    if (savedWeight) {
+                        const input = document.getElementById(`w_${exIdx}_${s}`);
+                        if (input) input.value = savedWeight;
+                    }
+                }
+            }
+        }
+
+        function requestQuitWorkout() {
+            showModal("Quitter la séance ?", "Êtes-vous sûr de vouloir interrompre ?", "fa-solid fa-triangle-exclamation text-warning", [
+                { label: "Annuler", class: "bg-slate-800 text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold border border-slate-700" },
+                { label: "Quitter", class: "bg-danger text-white px-4 py-2 rounded-lg text-xs font-bold", action: quitWorkout }
+            ]);
+        }
+
+        function quitWorkout() {
+            clearInterval(globalTimerInterval);
+            clearInterval(warmupTimerInterval);
+            stopRestTimer();
+            releaseWakeLock();
+            document.getElementById('screen-workout').classList.add('hidden');
+            document.getElementById('header-right').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.remove('hidden');
+        }
+
+        function requestFinishWorkout() {
+            const timeStr = document.getElementById('global-timer').textContent;
+            showModal("Séance terminée !", `Bravo ! Durée : ${timeStr}. Enregistré sur l'iPhone.`, "fa-solid fa-trophy text-amber-400", [
+                { label: "Retour", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold", action: quitWorkout }
+            ]);
+        }
+    </script>
+</body>
+</html>
