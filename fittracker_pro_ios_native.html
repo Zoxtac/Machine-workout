@@ -174,7 +174,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-bone text-warning text-sm"></i>
-                        <h4 class="font-bold text-sm text-white">Étape 2 • Échauffement Articulaire (2 min)</h4>
+                        <h4 class="font-bold text-sm text-white">Étape 2 • Échauffement Articulaire & Mobilité</h4>
                     </div>
                     <span class="text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded border border-warning/20 font-semibold">Mobilisation</span>
                 </div>
@@ -184,12 +184,12 @@
             <!-- EXERCICES DU PROGRAMME -->
             <div id="exercises-container" class="space-y-6"></div>
 
-            <!-- BLOC ETIREMENTS FINAUX AVEC TIMER -->
+            <!-- BLOC ETIREMENTS FINAUX -->
             <div id="stretching-card" class="bg-cardbg border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-child text-success text-sm"></i>
-                        <h4 class="font-bold text-sm text-white">Étape Finale • Étirements Spécifiques (30s chacun)</h4>
+                        <h4 class="font-bold text-sm text-white">Étape Finale • Étirements Spécifiques (30s)</h4>
                     </div>
                     <span class="text-[10px] bg-success/10 text-success px-2 py-0.5 rounded border border-success/20 font-semibold">Récupération</span>
                 </div>
@@ -246,19 +246,19 @@
                 warmup: "10 min Rameur",
                 warmupIcon: "fa-solid fa-water-ladder",
                 articular: [
-                    "Rotations d'épaules (avant/arrière) - 15x",
-                    "Rotateurs de la coiffe (bras plié à 90°) - 12x",
-                    "Moulinets légers de bras - 10x",
-                    "Flexions/Extensions des poignets - 10x"
+                    { title: "Rotations d'épaules (15x)", desc: "Faire de grands cercles lents avec les bras vers l'avant puis vers l'arrière pour lubrifier l'articulation." },
+                    { title: "Rotateurs de la coiffe (12x)", desc: "Bras plié à 90 le long du corps, pivoter l'avant-bras vers l'intérieur et l'extérieur." },
+                    { title: "Moulinets légers de bras (10x)", desc: "Tendre les bras et effectuer des cercles amples et souples." },
+                    { title: "Flexions/Extensions des poignets (10x)", desc: "Fléchir et tendre doucement les poignets dans les deux sens pour éviter les tensions." }
                 ],
                 stretching: [
-                    "Étirement grand dorsal - Bras droit (30s)",
-                    "Étirement grand dorsal - Bras gauche (30s)",
-                    "Étirement des pectoraux - Côté droit (30s)",
-                    "Étirement des pectoraux - Côté gauche (30s)",
-                    "Étirement des épaules - Bras droit (30s)",
-                    "Étirement des épaules - Bras gauche (30s)",
-                    "Mobilité et détente de la nuque (30s)"
+                    { title: "Étirement grand dorsal - Bras droit (30s)", desc: "S'accrocher ou lever le bras droit tendu et s'incliner légèrement sur le côté gauche." },
+                    { title: "Étirement grand dorsal - Bras gauche (30s)", desc: "S'accrocher ou lever le bras gauche tendu et s'incliner légèrement sur le côté droit." },
+                    { title: "Étirement pectoraux - Côté droit (30s)", desc: "Placer l'avant-bras droit contre un montant et pivoter doucement le buste vers la gauche." },
+                    { title: "Étirement pectoraux - Côté gauche (30s)", desc: "Placer l'avant-bras gauche contre un montant et pivoter doucement le buste vers la droite." },
+                    { title: "Étirement épaules - Bras droit (30s)", desc: "Ramener le bras droit tendu devant la poitrine en le tirant doucement avec l'autre main." },
+                    { title: "Étirement épaules - Bras gauche (30s)", desc: "Ramener le bras gauche tendu devant la poitrine en le tirant doucement avec l'autre main." },
+                    { title: "Mobilité et détente de la nuque (30s)", desc: "Incliner doucement la tête sur les côtés et vers l'avant en relâchant les épaules." }
                 ],
                 exercises: [
                     { name: "Tirage Vertical Poitrine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/11/tirage-vertical-poitrine.gif", desc: "Assis, calez les cuisses. Saisissez la barre prise large, tirez vers le haut de la poitrine en resserrant les omoplates." },
@@ -273,18 +273,18 @@
                 warmup: "10 min Rameur",
                 warmupIcon: "fa-solid fa-water-ladder",
                 articular: [
-                    "Rotations légères des poignets - 15x",
-                    "Extensions/Flexions douces des coudes - 12x",
-                    "Torsions contrôlées du buste debout - 10x",
-                    "Flexions latérales du buste sans charge - 10x"
+                    { title: "Rotations des poignets (15x)", desc: "Effectuer des cercles lents avec les poignets dans les deux sens." },
+                    { title: "Flexions douces des coudes (12x)", desc: "Plier et tendre les bras sans forcer pour lubrifier l'articulation." },
+                    { title: "Torsions contrôlées du buste (10x)", desc: "Pivoter doucement le haut du corps de gauche à droite, bras relâchés." },
+                    { title: "Flexions latérales du buste (10x)", desc: "Glisser la main le long de la cuisse sur le côté, sans pencher en avant." }
                 ],
                 stretching: [
-                    "Étirement des triceps - Bras droit (30s)",
-                    "Étirement des triceps - Bras gauche (30s)",
-                    "Étirement biceps/avant-bras - Bras droit (30s)",
-                    "Étirement biceps/avant-bras - Bras gauche (30s)",
-                    "Étirement des abdominaux (phoque/cobra) (30s)",
-                    "Étirement des lombaires (genoux poitrine) (30s)"
+                    { title: "Étirement triceps - Bras droit (30s)", desc: "Lever le bras droit, plier le coude derrière la tête et pousser doucement avec la main gauche." },
+                    { title: "Étirement triceps - Bras gauche (30s)", desc: "Lever le bras gauche, plier le coude derrière la tête et pousser doucement avec la main droite." },
+                    { title: "Étirement biceps/avant-bras - Bras droit (30s)", desc: "Tendre le bras droit paume vers l'avant et tirer doucement les doigts vers soi." },
+                    { title: "Étirement biceps/avant-bras - Bras gauche (30s)", desc: "Tendre le bras gauche paume vers l'avant et tirer doucement les doigts vers soi." },
+                    { title: "Étirement abdominaux (phoque/cobra) (30s)", desc: "Allongé sur le ventre, redresser le buste en appui sur les mains en gardant le bassin au sol." },
+                    { title: "Étirement lombaires (genoux poitrine) (30s)", desc: "Couché sur le dos, ramener les genoux vers la poitrine et enrouler doucement le bas du dos." }
                 ],
                 exercises: [
                     { name: "Machine Dips Assistée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/dips-assis-machine-matrix.gif", desc: "Mains sur les poignées, descendez en fléchissant les coudes à 90° puis poussez fort pour cibler les triceps." },
@@ -299,19 +299,19 @@
                 warmup: "10 min Vélo",
                 warmupIcon: "fa-solid fa-person-biking",
                 articular: [
-                    "Balancements de jambe (avant/arrière) - 15x",
-                    "Rotations des chevilles - 12x",
-                    "Flexions douces sans charge (Squat à vide) - 10x",
-                    "Ouvertures de hanches debout - 10x"
+                    { title: "Balancements de jambe (15x)", desc: "Se tenir à un support et balancer une jambe d'avant en arrière souplement." },
+                    { title: "Rotations des chevilles (12x)", desc: "Effectuer des cercles avec chaque pied pour préparer l'articulation." },
+                    { title: "Squats à vide (10x)", desc: "Fléchir les genoux en gardant le dos droit, sans charge, pour lubrifier les genoux." },
+                    { title: "Ouvertures de hanches (10x)", desc: "Monter le genou et l'ouvrir vers l'extérieur en décrivant un cercle." }
                 ],
                 stretching: [
-                    "Étirement quadriceps - Jambe droite (30s)",
-                    "Étirement quadriceps - Jambe gauche (30s)",
-                    "Étirement ischio-jambiers - Jambe droite (30s)",
-                    "Étirement ischio-jambiers - Jambe gauche (30s)",
-                    "Étirement fessiers - Côté droit (30s)",
-                    "Étirement fessiers - Côté gauche (30s)",
-                    "Étirement des adducteurs (papillon assis) (30s)"
+                    { title: "Étirement quadriceps - Jambe droite (30s)", desc: "Debout, attraper la cheville droite pour ramener le talon contre la fesse, genoux serrés." },
+                    { title: "Étirement quadriceps - Jambe gauche (30s)", desc: "Debout, attraper la cheville gauche pour ramener le talon contre la fesse, genoux serrés." },
+                    { title: "Étirement ischio-jambiers - Jambe droite (30s)", desc: "Poser le talon droit sur une surface surélevée, jambe tendue, et incliner le dos droit vers l'avant." },
+                    { title: "Étirement ischio-jambiers - Jambe gauche (30s)", desc: "Poser le talon gauche sur une surface surélevée, jambe tendue, et incliner le dos droit vers l'avant." },
+                    { title: "Étirement fessiers - Côté droit (30s)", desc: "Couché, croiser la cheville droite sur le genou gauche et tirer la cuisse vers soi." },
+                    { title: "Étirement fessiers - Côté gauche (30s)", desc: "Couché, croiser la cheville gauche sur le genou droit et tirer la cuisse vers soi." },
+                    { title: "Étirement adducteurs (papillon assis) (30s)", desc: "Assis, plantes de pieds collées, laisser descendre les genoux vers le sol en se tenant droit." }
                 ],
                 exercises: [
                     { name: "Presse à Cuisses Inclinée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif", desc: "Pieds placés sur le plateau, poussez par les talons sans verrouiller brutalement les genoux." },
@@ -401,24 +401,30 @@
             document.getElementById('warmup-title').textContent = workout.warmup;
             document.getElementById('warmup-icon').className = workout.warmupIcon;
 
-            // Remplir les listes d'échauffement articulaire
+            // Remplir les listes d'échauffement articulaire avec explications
             const artContainer = document.getElementById('articular-list');
-            artContainer.innerHTML = workout.articular.map((item, i) => `
-                <div onclick="toggleCheckItem(this)" class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300 cursor-pointer hover:border-accent/40 transition-colors">
-                    <span class="text-xs">${item}</span>
-                    <div class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 flex items-center justify-center transition-colors check-btn">
+            artContainer.innerHTML = workout.articular.map((item) => `
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
+                    <div class="flex-1 pr-2">
+                        <div class="font-bold text-white text-xs">${item.title}</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">${item.desc}</div>
+                    </div>
+                    <div onclick="toggleCheckItemParent(this)" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 flex items-center justify-center transition-colors check-btn cursor-pointer shrink-0">
                         <i class="fa-solid fa-check text-sm"></i>
                     </div>
                 </div>
             `).join('');
 
-            // Remplir les étirements finaux avec déclencheur de timer (30s) au clic sur le bouton chrono ou la ligne
+            // Remplir les étirements finaux avec explications et timer 30s
             const stretchContainer = document.getElementById('stretching-list');
-            stretchContainer.innerHTML = workout.stretching.map((item, i) => `
-                <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
-                    <span class="text-xs flex-1 pr-2">${item}</span>
-                    <div class="flex items-center gap-2">
-                        <button onclick="startRestTimer(30, 'Étirement (30s)')" class="px-2.5 py-1 rounded-lg bg-success/10 hover:bg-success/20 text-success text-[11px] font-bold border border-success/30 flex items-center gap-1 transition-colors">
+            stretchContainer.innerHTML = workout.stretching.map((item) => `
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
+                    <div class="flex-1 pr-2">
+                        <div class="font-bold text-white text-xs">${item.title}</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">${item.desc}</div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="startRestTimer(30, 'Étirement (30s)')" class="px-2.5 py-1.5 rounded-lg bg-success/10 hover:bg-success/20 text-success text-[11px] font-bold border border-success/30 flex items-center gap-1 transition-colors">
                             <i class="fa-solid fa-stopwatch"></i> 30s
                         </button>
                         <div onclick="toggleCheckItemParent(this)" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 flex items-center justify-center transition-colors check-btn cursor-pointer">
@@ -434,14 +440,6 @@
             loadSavedData();
             startGlobalTimer();
             await requestWakeLock();
-        }
-
-        function toggleCheckItem(rowElement) {
-            const btn = rowElement.querySelector('.check-btn');
-            btn.classList.toggle('bg-success');
-            btn.classList.toggle('text-white');
-            btn.classList.toggle('border-success');
-            rowElement.classList.toggle('border-success/50');
         }
 
         function toggleCheckItemParent(btnElement) {
