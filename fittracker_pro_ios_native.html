@@ -80,7 +80,7 @@
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-center">
                 <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Programme d'entraînement</p>
                 <h2 class="text-xl font-bold text-white mt-1">Sélectionnez votre séance du jour</h2>
-                <p class="text-xs text-slate-400 mt-1">100% Local • Stocké sur l'iPhone • 1h15 max</p>
+                <p class="text-xs text-slate-400 mt-1">100% Local • Stocké sur l'iPhone • Repos 2m / 3m</p>
             </div>
 
             <div class="grid gap-4">
@@ -94,7 +94,7 @@
                             <h3 class="font-bold text-base text-white group-hover:text-accent transition-colors">Haut du Corps</h3>
                             <span class="text-[10px] uppercase font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full border border-accent/20">Épaules, Dos & Pecs</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">10 min Rameur + Mobilité + 5 Machines</p>
+                        <p class="text-xs text-slate-400 mt-1">10 min Rameur + Mobilité + 5 Machines + Étirements</p>
                         <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
                             <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>~1h15</span>
                             <span><i class="fa-solid fa-layer-group mr-1 text-slate-500"></i>5 exos</span>
@@ -113,7 +113,7 @@
                             <h3 class="font-bold text-base text-white group-hover:text-accent transition-colors">Bras, Abdos & Lombaires</h3>
                             <span class="text-[10px] uppercase font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full border border-accent/20">Biceps, Triceps, Core</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">10 min Rameur + Mobilité + 5 Exercices</p>
+                        <p class="text-xs text-slate-400 mt-1">10 min Rameur + Mobilité + 5 Exercices + Étirements</p>
                         <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
                             <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>~1h15</span>
                             <span><i class="fa-solid fa-layer-group mr-1 text-slate-500"></i>5 exos</span>
@@ -132,7 +132,7 @@
                             <h3 class="font-bold text-base text-white group-hover:text-accent transition-colors">Bas du Corps</h3>
                             <span class="text-[10px] uppercase font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full border border-accent/20">Cuisses & Fessiers</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">10 min Vélo + Mobilité + 5 Machines</p>
+                        <p class="text-xs text-slate-400 mt-1">10 min Vélo + Mobilité + 5 Machines + Étirements</p>
                         <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
                             <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>~1h20</span>
                             <span><i class="fa-solid fa-layer-group mr-1 text-slate-500"></i>5 exos</span>
@@ -178,11 +178,23 @@
                     </div>
                     <span class="text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded border border-warning/20 font-semibold">Mobilisation</span>
                 </div>
-                <div id="articular-list" class="grid grid-cols-2 gap-2 text-xs"></div>
+                <div id="articular-list" class="space-y-2 text-xs"></div>
             </div>
 
             <!-- EXERCICES DU PROGRAMME -->
             <div id="exercises-container" class="space-y-6"></div>
+
+            <!-- BLOC ETIREMENTS FINAUX AVEC TIMER -->
+            <div id="stretching-card" class="bg-cardbg border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-child text-success text-sm"></i>
+                        <h4 class="font-bold text-sm text-white">Étape Finale • Étirements Spécifiques (30s chacun)</h4>
+                    </div>
+                    <span class="text-[10px] bg-success/10 text-success px-2 py-0.5 rounded border border-success/20 font-semibold">Récupération</span>
+                </div>
+                <div id="stretching-list" class="space-y-2 text-xs"></div>
+            </div>
 
             <!-- BOUTON TERMINER LA SÉANCE -->
             <div class="pt-4">
@@ -193,7 +205,7 @@
         </div>
     </main>
 
-    <!-- BARRE FLOTTANTE DU MINUTEUR DE REPOS -->
+    <!-- BARRE FLOTTANTE DU MINUTEUR DE REPOS / ETIREMENT -->
     <div id="rest-timer-bar" class="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-accent/40 backdrop-blur-md p-3 z-40 transform translate-y-full transition-transform duration-300">
         <div class="max-w-xl mx-auto flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -201,15 +213,15 @@
                     <i class="fa-solid fa-stopwatch text-lg"></i>
                 </div>
                 <div>
-                    <div class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Temps de repos</div>
-                    <div id="rest-timer-display" class="text-2xl font-mono font-bold text-white">01:30</div>
+                    <div id="rest-label" class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Minuteur</div>
+                    <div id="rest-timer-display" class="text-2xl font-mono font-bold text-white">00:30</div>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
                 <button onclick="adjustRestTimer(-15)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700">-15s</button>
                 <button onclick="adjustRestTimer(15)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700">+15s</button>
-                <button onclick="stopRestTimer()" class="bg-accent hover:bg-accenthover text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Passer</button>
+                <button onclick="stopRestTimer()" class="bg-accent hover:bg-accenthover text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Fermer</button>
             </div>
         </div>
     </div>
@@ -234,17 +246,26 @@
                 warmup: "10 min Rameur",
                 warmupIcon: "fa-solid fa-water-ladder",
                 articular: [
-                    "15x Rotations d'épaules (avant/arrière)",
-                    "12x Rotateurs de la coiffe (bras plié à 90°)",
-                    "10x Moulinets légers de bras",
-                    "10x Flexions/Extensions des poignets"
+                    "Rotations d'épaules (avant/arrière) - 15x",
+                    "Rotateurs de la coiffe (bras plié à 90°) - 12x",
+                    "Moulinets légers de bras - 10x",
+                    "Flexions/Extensions des poignets - 10x"
+                ],
+                stretching: [
+                    "Étirement grand dorsal - Bras droit (30s)",
+                    "Étirement grand dorsal - Bras gauche (30s)",
+                    "Étirement des pectoraux - Côté droit (30s)",
+                    "Étirement des pectoraux - Côté gauche (30s)",
+                    "Étirement des épaules - Bras droit (30s)",
+                    "Étirement des épaules - Bras gauche (30s)",
+                    "Mobilité et détente de la nuque (30s)"
                 ],
                 exercises: [
-                    { name: "Tirage Vertical Poitrine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/11/tirage-vertical-poitrine.gif", desc: "Assis, calez les cuisses. Saisissez la barre prise large, tirez vers le haut de la poitrine en resserrant les omoplates." },
-                    { name: "Rowing Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif", desc: "Buste droit appuyé ou gainé, tirez la poignée vers le nombril en gardant les coudes proches du corps." },
-                    { name: "Développé Épaules à la Machine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif", desc: "Réglez le siège pour avoir les poignées au niveau des épaules. Poussez vers le haut sans bloquer les coudes." },
-                    { name: "Élévation Latérale à la Poulie en Inclinaison", sets: 3, reps: "12-15 reps", restSec: 60, image: "https://www.docteur-fitness.com/wp-content/uploads/2025/11/elevation-laterale-a-la-poulie-en-inclinaison.gif", desc: "Buste légèrement incliné, montez la poignée latéralement jusqu'à la hauteur de l'épaule de façon fluide." },
-                    { name: "Pectoral à la Machine (Pec Deck / Butterfly)", sets: 3, reps: "12-15 reps", restSec: 60, image: "https://i.pinimg.com/originals/a2/12/cd/a212cde8804175ee82be3abe83ca51e3.gif", desc: "Assis le dos bien plaqué, resserrez les poignées devant vous en contractant le torse." }
+                    { name: "Tirage Vertical Poitrine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/11/tirage-vertical-poitrine.gif", desc: "Assis, calez les cuisses. Saisissez la barre prise large, tirez vers le haut de la poitrine en resserrant les omoplates." },
+                    { name: "Rowing Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif", desc: "Buste droit appuyé ou gainé, tirez la poignée vers le nombril en gardant les coudes proches du corps." },
+                    { name: "Développé Épaules à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif", desc: "Réglez le siège pour avoir les poignées au niveau des épaules. Poussez vers le haut sans bloquer les coudes." },
+                    { name: "Élévation Latérale à la Poulie en Inclinaison", sets: 3, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2025/11/elevation-laterale-a-la-poulie-en-inclinaison.gif", desc: "Buste légèrement incliné, montez la poignée latéralement jusqu'à la hauteur de l'épaule de façon fluide." },
+                    { name: "Pectoral à la Machine (Pec Deck / Butterfly)", sets: 3, reps: "12-15 reps", restSec: 120, image: "https://i.pinimg.com/originals/a2/12/cd/a212cde8804175ee82be3abe83ca51e3.gif", desc: "Assis le dos bien plaqué, resserrez les poignées devant vous en contractant le torse." }
                 ]
             },
             {
@@ -252,17 +273,25 @@
                 warmup: "10 min Rameur",
                 warmupIcon: "fa-solid fa-water-ladder",
                 articular: [
-                    "15x Rotations légères des poignets",
-                    "12x Extensions/Flexions douces des coudes",
-                    "10x Torsions contrôlées du buste debout",
-                    "10x Flexions latérales du buste sans charge"
+                    "Rotations légères des poignets - 15x",
+                    "Extensions/Flexions douces des coudes - 12x",
+                    "Torsions contrôlées du buste debout - 10x",
+                    "Flexions latérales du buste sans charge - 10x"
+                ],
+                stretching: [
+                    "Étirement des triceps - Bras droit (30s)",
+                    "Étirement des triceps - Bras gauche (30s)",
+                    "Étirement biceps/avant-bras - Bras droit (30s)",
+                    "Étirement biceps/avant-bras - Bras gauche (30s)",
+                    "Étirement des abdominaux (phoque/cobra) (30s)",
+                    "Étirement des lombaires (genoux poitrine) (30s)"
                 ],
                 exercises: [
-                    { name: "Machine Dips Assistée", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/dips-assis-machine-matrix.gif", desc: "Mains sur les poignées, descendez en fléchissant les coudes à 90° puis poussez fort pour cibler les triceps." },
-                    { name: "Extension Triceps Poulie Haute à la Corde", sets: 4, reps: "12-15 reps", restSec: 75, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/extension-triceps-poulie-haute-corde.gif", desc: "Coudes collés aux côtes, poussez la corde vers le bas en écartant les extrémités en bas de mouvement." },
-                    { name: "Curl Biceps Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 75, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-pupitre-machine-prechargee.gif", desc: "Coudes calés sur le pupitre de la machine, fléchissez les bras pour contracter puissamment les biceps." },
-                    { name: "Crunch à la Machine", sets: 4, reps: "15-20 reps", restSec: 60, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/crunch-machine-abdos.gif", desc: "Saisissez les poignées et enroulez le buste vers le bas en contractant volontairement les abdominaux." },
-                    { name: "Extension Lombaire au Banc 45°", sets: 3, reps: "12-15 reps", restSec: 60, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/extension-lombaire-au-banc-45.gif", desc: "Bassin calé sur le boudin, descendez le buste puis remontez jusqu'à l'alignement du corps pour renforcer le bas du dos." }
+                    { name: "Machine Dips Assistée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/dips-assis-machine-matrix.gif", desc: "Mains sur les poignées, descendez en fléchissant les coudes à 90° puis poussez fort pour cibler les triceps." },
+                    { name: "Extension Triceps Poulie Haute à la Corde", sets: 4, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/extension-triceps-poulie-haute-corde.gif", desc: "Coudes collés aux côtes, poussez la corde vers le bas en écartant les extrémités en bas de mouvement." },
+                    { name: "Curl Biceps Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-pupitre-machine-prechargee.gif", desc: "Coudes calés sur le pupitre de la machine, fléchissez les bras pour contracter puissamment les biceps." },
+                    { name: "Crunch à la Machine", sets: 4, reps: "15-20 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/crunch-machine-abdos.gif", desc: "Saisissez les poignées et enroulez le buste vers le bas en contractant volontairement les abdominaux." },
+                    { name: "Extension Lombaire au Banc 45°", sets: 3, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/extension-lombaire-au-banc-45.gif", desc: "Bassin calé sur le boudin, descendez le buste puis remontez jusqu'à l'alignement du corps pour renforcer le bas du dos." }
                 ]
             },
             {
@@ -270,28 +299,37 @@
                 warmup: "10 min Vélo",
                 warmupIcon: "fa-solid fa-person-biking",
                 articular: [
-                    "15x Balancements de jambe (avant/arrière)",
-                    "12x Rotations des chevilles",
-                    "10x Flexions douces sans charge (Squat à vide)",
-                    "10x Ouvertures de hanches debout"
+                    "Balancements de jambe (avant/arrière) - 15x",
+                    "Rotations des chevilles - 12x",
+                    "Flexions douces sans charge (Squat à vide) - 10x",
+                    "Ouvertures de hanches debout - 10x"
+                ],
+                stretching: [
+                    "Étirement quadriceps - Jambe droite (30s)",
+                    "Étirement quadriceps - Jambe gauche (30s)",
+                    "Étirement ischio-jambiers - Jambe droite (30s)",
+                    "Étirement ischio-jambiers - Jambe gauche (30s)",
+                    "Étirement fessiers - Côté droit (30s)",
+                    "Étirement fessiers - Côté gauche (30s)",
+                    "Étirement des adducteurs (papillon assis) (30s)"
                 ],
                 exercises: [
-                    { name: "Presse à Cuisses Inclinée", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif", desc: "Pieds placés sur le plateau, poussez par les talons sans verrouiller brutalement les genoux." },
-                    { name: "Leg Extension (Quadriceps)", sets: 4, reps: "12-15 reps", restSec: 75, image: "https://i.pinimg.com/originals/2f/88/8a/2f888a80d3e49f5e31ee372116437540.gif", desc: "Dos bien appuyé au siège, tendez les jambes vers le haut en bloquant 1 seconde en contraction haute." },
-                    { name: "Leg Curl Assis (Ischio-Jambiers)", sets: 4, reps: "12-15 reps", restSec: 75, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/leg-curl-assis-machine.gif", desc: "Fléchissez les genoux pour ramener le boudin sous le siège de façon fluide et contrôlée." },
-                    { name: "Machine Hip Thrust (Fessiers)", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/hip-thrust-machine-leg-extension.gif", desc: "Cible N°1 du grand fessier : poussez le bassin vers le haut en contractant fort les fessiers en haut." },
-                    { name: "Machine Abducteurs", sets: 4, reps: "15-20 reps", restSec: 60, image: "https://i.pinimg.com/originals/a0/85/b9/a085b9cee9496d9f0c9e9aa733479bfb.gif", desc: "Écartez les cuisses contre les coussins pour travailler le haut/côté des fessiers (moyen fessier)." }
+                    { name: "Presse à Cuisses Inclinée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif", desc: "Pieds placés sur le plateau, poussez par les talons sans verrouiller brutalement les genoux." },
+                    { name: "Leg Extension (Quadriceps)", sets: 4, reps: "12-15 reps", restSec: 120, image: "https://i.pinimg.com/originals/2f/88/8a/2f888a80d3e49f5e31ee372116437540.gif", desc: "Dos bien appuyé au siège, tendez les jambes vers le haut en bloquant 1 seconde en contraction haute." },
+                    { name: "Leg Curl Assis (Ischio-Jambiers)", sets: 4, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/leg-curl-assis-machine.gif", desc: "Fléchissez les genoux pour ramener le boudin sous le siège de façon fluide et contrôlée." },
+                    { name: "Machine Hip Thrust (Fessiers)", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/hip-thrust-machine-leg-extension.gif", desc: "Cible N°1 du grand fessier : poussez le bassin vers le haut en contractant fort les fessiers en haut." },
+                    { name: "Machine Abducteurs", sets: 4, reps: "15-20 reps", restSec: 120, image: "https://i.pinimg.com/originals/a0/85/b9/a085b9cee9496d9f0c9e9aa733479bfb.gif", desc: "Écartez les cuisses contre les coussins pour travailler le haut/côté des fessiers (moyen fessier)." }
                 ]
             }
         ];
 
         let activeWorkoutIndex = null;
         let globalTimerInterval = null;
-        let globalSeconds = 0;
+        let globalStartTime = 0;
         let warmupTimerInterval = null;
         let warmupSecondsLeft = 600;
         let restTimerInterval = null;
-        let restSecondsLeft = 0;
+        let restEndTime = 0;
         let wakeLock = null;
 
         async function requestWakeLock() {
@@ -363,48 +401,87 @@
             document.getElementById('warmup-title').textContent = workout.warmup;
             document.getElementById('warmup-icon').className = workout.warmupIcon;
 
+            // Remplir les listes d'échauffement articulaire
             const artContainer = document.getElementById('articular-list');
-            artContainer.innerHTML = workout.articular.map(item => `
-                <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2 text-slate-300">
-                    <i class="fa-solid fa-angle-right text-warning text-[10px]"></i>
-                    <span>${item}</span>
+            artContainer.innerHTML = workout.articular.map((item, i) => `
+                <div onclick="toggleCheckItem(this)" class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300 cursor-pointer hover:border-accent/40 transition-colors">
+                    <span class="text-xs">${item}</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 flex items-center justify-center transition-colors check-btn">
+                        <i class="fa-solid fa-check text-sm"></i>
+                    </div>
+                </div>
+            `).join('');
+
+            // Remplir les étirements finaux avec déclencheur de timer (30s) au clic sur le bouton chrono ou la ligne
+            const stretchContainer = document.getElementById('stretching-list');
+            stretchContainer.innerHTML = workout.stretching.map((item, i) => `
+                <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
+                    <span class="text-xs flex-1 pr-2">${item}</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="startRestTimer(30, 'Étirement (30s)')" class="px-2.5 py-1 rounded-lg bg-success/10 hover:bg-success/20 text-success text-[11px] font-bold border border-success/30 flex items-center gap-1 transition-colors">
+                            <i class="fa-solid fa-stopwatch"></i> 30s
+                        </button>
+                        <div onclick="toggleCheckItemParent(this)" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 flex items-center justify-center transition-colors check-btn cursor-pointer">
+                            <i class="fa-solid fa-check text-sm"></i>
+                        </div>
+                    </div>
                 </div>
             `).join('');
 
             const container = document.getElementById('exercises-container');
             container.innerHTML = workout.exercises.map((ex, exIdx) => renderExerciseCard(ex, exIdx)).join('');
 
-            loadSavedWeights();
+            loadSavedData();
             startGlobalTimer();
             await requestWakeLock();
+        }
+
+        function toggleCheckItem(rowElement) {
+            const btn = rowElement.querySelector('.check-btn');
+            btn.classList.toggle('bg-success');
+            btn.classList.toggle('text-white');
+            btn.classList.toggle('border-success');
+            rowElement.classList.toggle('border-success/50');
+        }
+
+        function toggleCheckItemParent(btnElement) {
+            btnElement.classList.toggle('bg-success');
+            btnElement.classList.toggle('text-white');
+            btnElement.classList.toggle('border-success');
+            const parentRow = btnElement.closest('div.bg-slate-900\\/60');
+            if (parentRow) {
+                parentRow.classList.toggle('border-success/50');
+            }
         }
 
         function renderExerciseCard(ex, exIdx) {
             let setsRows = '';
             for (let s = 1; s <= ex.sets; s++) {
                 const prevValKey = `prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`;
+                const prevRpeKey = `prev_rpe_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`;
                 const prevVal = localStorage.getItem(prevValKey) || '--';
+                const prevRpe = localStorage.getItem(prevRpeKey) || '-';
 
                 setsRows += `
                     <div class="flex flex-col gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-400 w-12">Série ${s}</span>
-                                <span class="text-[10px] text-slate-500 font-mono bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700/60">
-                                    Précédent: <strong class="text-slate-300">${prevVal} kg</strong>
+                                <span class="text-[10px] text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded border border-slate-700/60 flex items-center gap-1.5">
+                                    Précédent: <strong class="text-white">${prevVal} kg</strong> <span class="text-warning">(RPE ${prevRpe})</span>
                                 </span>
                             </div>
                             <span class="text-xs font-medium text-slate-300">${ex.reps}</span>
                         </div>
                         <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
                             <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
-                                <input type="number" step="2.5" placeholder="0" id="w_${exIdx}_${s}" onchange="saveWeight(${exIdx}, ${s}, this.value)" class="w-12 bg-transparent text-center font-bold text-sm text-accent focus:outline-none">
+                                <input type="number" step="2.5" placeholder="0" id="w_${exIdx}_${s}" onchange="saveCurrentWeight(${exIdx}, ${s}, this.value)" class="w-12 bg-transparent text-center font-bold text-sm text-accent focus:outline-none">
                                 <span class="text-[10px] text-slate-400 font-semibold">kg</span>
                             </div>
 
                             <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
                                 <span class="text-[10px] text-slate-400 font-bold">RPE</span>
-                                <select id="rpe_${exIdx}_${s}" onchange="saveRPE(${exIdx}, ${s}, this.value)" class="bg-transparent text-xs text-warning font-bold focus:outline-none cursor-pointer">
+                                <select id="rpe_${exIdx}_${s}" onchange="saveCurrentRPE(${exIdx}, ${s}, this.value)" class="bg-transparent text-xs text-warning font-bold focus:outline-none cursor-pointer">
                                     <option value="" class="bg-slate-900 text-slate-400">-</option>
                                     <option value="6" class="bg-slate-900 text-emerald-400">6 (Facile)</option>
                                     <option value="7" class="bg-slate-900 text-emerald-400">7 (Modéré)</option>
@@ -414,13 +491,22 @@
                                 </select>
                             </div>
 
-                            <button onclick="completeSet(this, ${ex.restSec})" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 hover:text-success border border-slate-700 flex items-center justify-center transition-colors">
+                            <button onclick="completeSet(this, ${ex.restSec}, ${exIdx}, ${s})" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 hover:text-success border border-slate-700 flex items-center justify-center transition-colors check-btn">
                                 <i class="fa-solid fa-check text-sm"></i>
                             </button>
                         </div>
                     </div>
                 `;
             }
+
+            const isLastEx = exIdx === workouts[activeWorkoutIndex].exercises.length - 1;
+            const exerciseRestBtn = !isLastEx ? `
+                <div class="pt-2">
+                    <button onclick="startRestTimer(180, 'Repos entre exercices (3 min)')" class="w-full bg-slate-800 hover:bg-slate-700 text-accent border border-accent/40 rounded-xl py-2.5 text-xs font-bold transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-clock"></i> Lancer le repos de 3 min avant l'exercice suivant
+                    </button>
+                </div>
+            ` : '';
 
             return `
                 <div class="bg-cardbg border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl">
@@ -435,19 +521,20 @@
                     <div class="p-4 space-y-4">
                         <p class="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-2.5 rounded-xl border border-slate-800">${ex.desc}</p>
                         <div class="space-y-2">${setsRows}</div>
+                        ${exerciseRestBtn}
                     </div>
                 </div>
             `;
         }
 
         function startGlobalTimer() {
-            globalSeconds = 0;
+            globalStartTime = Date.now();
             clearInterval(globalTimerInterval);
             globalTimerInterval = setInterval(() => {
-                globalSeconds++;
-                const hrs = Math.floor(globalSeconds / 3600);
-                const mins = Math.floor((globalSeconds % 3600) / 60);
-                const secs = globalSeconds % 60;
+                const elapsedSec = Math.floor((Date.now() - globalStartTime) / 1000);
+                const hrs = Math.floor(elapsedSec / 3600);
+                const mins = Math.floor((elapsedSec % 3600) / 60);
+                const secs = elapsedSec % 60;
                 document.getElementById('global-timer').textContent = 
                     `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }, 1000);
@@ -468,7 +555,7 @@
                     } else {
                         clearInterval(warmupTimerInterval);
                         warmupTimerInterval = null;
-                        showModal("Échauffement terminé !", "Passez aux 2 minutes de mobilisation articulaire.", "fa-solid fa-circle-check text-success", [{ label: "Compris !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold" }]);
+                        showModal("Échauffement terminé !", "Passez aux mouvements d'échauffement articulaire.", "fa-solid fa-circle-check text-success", [{ label: "Compris !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold" }]);
                     }
                 }, 1000);
             }
@@ -488,24 +575,27 @@
             document.getElementById('warmup-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        function completeSet(btn, restSec) {
+        function completeSet(btn, restSec, exIdx, s) {
             btn.classList.toggle('bg-success');
             btn.classList.toggle('text-white');
             btn.classList.toggle('border-success');
             if (btn.classList.contains('bg-success')) {
-                startRestTimer(restSec);
+                startRestTimer(restSec, `Temps de repos (2 min - Série ${s})`);
             }
         }
 
-        function startRestTimer(seconds) {
-            restSecondsLeft = seconds;
+        function startRestTimer(seconds, labelText = 'Temps de repos') {
+            restEndTime = Date.now() + (seconds * 1000);
+            document.getElementById('rest-label').textContent = labelText;
             updateRestDisplay();
             document.getElementById('rest-timer-bar').classList.remove('translate-y-full');
             clearInterval(restTimerInterval);
             restTimerInterval = setInterval(() => {
-                if (restSecondsLeft > 0) {
-                    restSecondsLeft--;
-                    updateRestDisplay();
+                const timeLeft = Math.ceil((restEndTime - Date.now()) / 1000);
+                if (timeLeft > 0) {
+                    const m = Math.floor(timeLeft / 60);
+                    const s = timeLeft % 60;
+                    document.getElementById('rest-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 } else {
                     stopRestTimer();
                 }
@@ -513,7 +603,7 @@
         }
 
         function adjustRestTimer(amount) {
-            restSecondsLeft = Math.max(0, restSecondsLeft + amount);
+            restEndTime += (amount * 1000);
             updateRestDisplay();
         }
 
@@ -524,33 +614,49 @@
         }
 
         function updateRestDisplay() {
-            const m = Math.floor(restSecondsLeft / 60);
-            const s = restSecondsLeft % 60;
+            const timeLeft = Math.max(0, Math.ceil((restEndTime - Date.now()) / 1000));
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
             document.getElementById('rest-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        function saveWeight(exIdx, setNum, value) {
-            const currentKey = `curr_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${setNum}`;
-            const prevKey = `prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${setNum}`;
-            const oldCurrent = localStorage.getItem(currentKey);
-            if (oldCurrent && oldCurrent !== value) {
-                localStorage.setItem(prevKey, oldCurrent);
-            }
-            localStorage.setItem(currentKey, value);
+        function saveCurrentWeight(exIdx, setNum, value) {
+            localStorage.setItem(`temp_w_${activeWorkoutIndex}_${exIdx}_${setNum}`, value);
         }
 
-        function saveRPE(exIdx, setNum, value) {
-            localStorage.setItem(`rpe_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${setNum}`, value);
+        function saveCurrentRPE(exIdx, setNum, value) {
+            localStorage.setItem(`temp_rpe_${activeWorkoutIndex}_${exIdx}_${setNum}`, value);
         }
 
-        function loadSavedWeights() {
+        function loadSavedData() {
             const workout = workouts[activeWorkoutIndex];
             workout.exercises.forEach((ex, exIdx) => {
                 for (let s = 1; s <= ex.sets; s++) {
-                    const savedWeight = localStorage.getItem(`curr_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`);
-                    if (savedWeight) {
+                    const savedW = localStorage.getItem(`temp_w_${activeWorkoutIndex}_${exIdx}_${s}`);
+                    if (savedW) {
                         const input = document.getElementById(`w_${exIdx}_${s}`);
-                        if (input) input.value = savedWeight;
+                        if (input) input.value = savedW;
+                    }
+                    const savedRpe = localStorage.getItem(`temp_rpe_${activeWorkoutIndex}_${exIdx}_${s}`);
+                    if (savedRpe) {
+                        const select = document.getElementById(`rpe_${exIdx}_${s}`);
+                        if (select) select.value = savedRpe;
+                    }
+                }
+            });
+        }
+
+        function persistWorkoutResults() {
+            const workout = workouts[activeWorkoutIndex];
+            workout.exercises.forEach((ex, exIdx) => {
+                for (let s = 1; s <= ex.sets; s++) {
+                    const wInput = document.getElementById(`w_${exIdx}_${s}`);
+                    const rpeSelect = document.getElementById(`rpe_${exIdx}_${s}`);
+                    if (wInput && wInput.value) {
+                        localStorage.setItem(`prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`, wInput.value);
+                    }
+                    if (rpeSelect && rpeSelect.value) {
+                        localStorage.setItem(`prev_rpe_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`, rpeSelect.value);
                     }
                 }
             });
@@ -574,8 +680,9 @@
         }
 
         function requestFinishWorkout() {
+            persistWorkoutResults();
             const timeStr = document.getElementById('global-timer').textContent;
-            showModal("Félicitations !", `Séance terminée en ${timeStr}. Vos performances sont enregistrées sur l'iPhone !`, "fa-solid fa-trophy text-amber-400", [
+            showModal("Félicitations !", `Séance terminée en ${timeStr}. Vos performances et RPE ont été enregistrés pour vos prochaines séances !`, "fa-solid fa-trophy text-amber-400", [
                 { label: "Retour au tableau de bord", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold", action: quitWorkout }
             ]);
         }
