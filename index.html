@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Machine-workout">
+    <meta name="apple-mobile-web-app-title" content="Machine workout">
     
     <!-- Icône personnalisée pour l'écran d'accueil iPhone -->
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>Machine-workout</title>
+    <title>Machine workout</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -47,7 +48,7 @@
         }
     </style>
 </head>
-<body class="bg-darkbg text-slate-100 min-h-screen font-sans pb-24">
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans pb-28">
 
     <!-- HEADER DE L'APPLICATION -->
     <header class="bg-cardbg/90 backdrop-blur border-b border-slate-700/50 sticky top-0 z-30 px-4 py-3">
@@ -55,7 +56,7 @@
             <div class="flex items-center gap-2" id="header-left">
                 <i class="fa-solid fa-dumbbell text-accent text-xl"></i>
                 <div>
-                    <h1 class="font-bold text-lg text-white tracking-wide leading-none">Machine-workout</h1>
+                    <h1 class="font-bold text-lg text-white tracking-wide leading-none">Machine workout</h1>
                     <span id="wake-status" class="text-[9px] text-slate-400 flex items-center gap-1 mt-0.5">
                         <i class="fa-solid fa-moon text-slate-500"></i> Veille normale
                     </span>
@@ -73,6 +74,18 @@
         </div>
     </header>
 
+    <!-- BARRE DE NAVIGATION PRINCIPALE (ONGLETS) -->
+    <nav id="main-nav" class="max-w-xl mx-auto px-4 pt-4">
+        <div class="bg-cardbg border border-slate-700/80 rounded-2xl p-1.5 flex items-center gap-1 shadow-lg">
+            <button onclick="switchTab('dashboard')" id="nav-btn-dashboard" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-accent text-white shadow">
+                <i class="fa-solid fa-house"></i> Entraînement
+            </button>
+            <button onclick="switchTab('stats')" id="nav-btn-stats" class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-chart-line"></i> Suivi & Stats
+            </button>
+        </div>
+    </nav>
+
     <main class="max-w-xl mx-auto px-4 pt-4">
 
         <!-- ECRAN 1: DASHBOARD / CHOIX DE SÉANCE -->
@@ -80,7 +93,7 @@
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-center">
                 <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Programme d'entraînement</p>
                 <h2 class="text-xl font-bold text-white mt-1">Sélectionnez votre séance du jour</h2>
-                <p class="text-xs text-slate-400 mt-1">100% Local • Stocké sur l'iPhone • Repos 2m / 3m</p>
+                <p class="text-xs text-slate-400 mt-1">100% Local • Stocké sur l'appareil • Repos 2m / 3m</p>
             </div>
 
             <div class="grid gap-4">
@@ -140,6 +153,60 @@
                     </div>
                     <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-accent transition-colors"></i>
                 </button>
+            </div>
+        </div>
+
+        <!-- ECRAN STATS / SUIVI AMÉLIORÉ -->
+        <div id="screen-stats" class="hidden space-y-6">
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-center">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Analyse de progression</p>
+                <h2 class="text-xl font-bold text-white mt-1">Suivi de vos performances</h2>
+                <p class="text-xs text-slate-400 mt-1">Vue d'ensemble de vos efforts et statistiques globales</p>
+            </div>
+
+            <!-- GRILLES DE STATS / KPIS -->
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-cardbg border border-slate-700/80 rounded-2xl p-3 text-center shadow-md">
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Séances</div>
+                    <div id="kpi-total-sessions" class="text-lg font-bold text-white mt-1">0</div>
+                </div>
+                <div class="bg-cardbg border border-slate-700/80 rounded-2xl p-3 text-center shadow-md">
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Max Poids</div>
+                    <div id="kpi-max-weight" class="text-lg font-bold text-accent mt-1">0 kg</div>
+                </div>
+                <div class="bg-cardbg border border-slate-700/80 rounded-2xl p-3 text-center shadow-md">
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Moyenne Globale</div>
+                    <div id="kpi-global-avg" class="text-lg font-bold text-success mt-1">0 kg</div>
+                </div>
+            </div>
+
+            <!-- CARTE GRAPHIQUE AVEC FILTRE -->
+            <div class="bg-cardbg border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-accent"></i> Évolution des performances
+                    </h3>
+                    <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-700">
+                        <button onclick="setChartMetric('weight')" id="btn-metric-weight" class="px-2.5 py-1 text-[10px] font-bold rounded bg-accent text-white transition-all">Poids moy.</button>
+                        <button onclick="setChartMetric('volume')" id="btn-metric-volume" class="px-2.5 py-1 text-[10px] font-semibold rounded text-slate-400 hover:text-white transition-all">Volume</button>
+                    </div>
+                </div>
+                <div class="relative h-60 w-full">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- HISTORIQUE DES SÉANCES DÉTAILLÉ -->
+            <div class="bg-cardbg border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                        <i class="fa-solid fa-history text-warning"></i> Historique des entraînements
+                    </h3>
+                    <button onclick="clearHistoryData()" class="text-[10px] text-slate-500 hover:text-danger transition-colors">Réinitialiser</button>
+                </div>
+                <div id="history-list" class="space-y-2 text-xs">
+                    <!-- Rempli dynamiquement -->
+                </div>
             </div>
         </div>
 
@@ -238,8 +305,17 @@
         </div>
     </div>
 
-    <!-- SCRIPT APPLICATION -->
+    <!-- SCRIPT APPLICATION ET ENREGISTREMENT DU SERVICE WORKER -->
     <script>
+        // Enregistrement du Service Worker pour un fonctionnement 100% hors-ligne
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker enregistré avec succès !', reg.scope))
+                    .catch(err => console.log('Échec de l\'enregistrement du Service Worker :', err));
+            });
+        }
+
         const workouts = [
             {
                 title: "Haut du Corps (Épaules, Dos & Pecs)",
@@ -331,6 +407,29 @@
         let restTimerInterval = null;
         let restEndTime = 0;
         let wakeLock = null;
+        let progressChartInstance = null;
+        let currentChartMetric = 'weight';
+
+        // Gestion des onglets
+        function switchTab(tabName) {
+            const dashScreen = document.getElementById('screen-dashboard');
+            const statsScreen = document.getElementById('screen-stats');
+            const btnDash = document.getElementById('nav-btn-dashboard');
+            const btnStats = document.getElementById('nav-btn-stats');
+
+            if (tabName === 'dashboard') {
+                dashScreen.classList.remove('hidden');
+                statsScreen.classList.add('hidden');
+                btnDash.className = "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-accent text-white shadow";
+                btnStats.className = "flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2";
+            } else {
+                dashScreen.classList.add('hidden');
+                statsScreen.classList.remove('hidden');
+                btnStats.className = "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-accent text-white shadow";
+                btnDash.className = "flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2";
+                loadStatsAndChart();
+            }
+        }
 
         async function requestWakeLock() {
             try {
@@ -394,6 +493,8 @@
             const workout = workouts[index];
 
             document.getElementById('screen-dashboard').classList.add('hidden');
+            document.getElementById('screen-stats').classList.add('hidden');
+            document.getElementById('main-nav').classList.add('hidden');
             document.getElementById('screen-workout').classList.remove('hidden');
             document.getElementById('header-right').classList.remove('hidden');
             document.getElementById('header-right').classList.add('flex');
@@ -401,7 +502,7 @@
             document.getElementById('warmup-title').textContent = workout.warmup;
             document.getElementById('warmup-icon').className = workout.warmupIcon;
 
-            // Remplir les listes d'échauffement articulaire avec explications
+            // Remplir les listes d'échauffement articulaire
             const artContainer = document.getElementById('articular-list');
             artContainer.innerHTML = workout.articular.map((item) => `
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
@@ -415,7 +516,7 @@
                 </div>
             `).join('');
 
-            // Remplir les étirements finaux avec explications et timer 30s
+            // Remplir les étirements finaux
             const stretchContainer = document.getElementById('stretching-list');
             stretchContainer.innerHTML = workout.stretching.map((item) => `
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
@@ -646,18 +747,144 @@
 
         function persistWorkoutResults() {
             const workout = workouts[activeWorkoutIndex];
+            let totalWeight = 0;
+            let weightCount = 0;
+            let maxW = 0;
+
             workout.exercises.forEach((ex, exIdx) => {
                 for (let s = 1; s <= ex.sets; s++) {
                     const wInput = document.getElementById(`w_${exIdx}_${s}`);
                     const rpeSelect = document.getElementById(`rpe_${exIdx}_${s}`);
                     if (wInput && wInput.value) {
-                        localStorage.setItem(`prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`, wInput.value);
+                        const val = parseFloat(wInput.value);
+                        localStorage.setItem(`prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`, val);
+                        totalWeight += val;
+                        weightCount++;
+                        if (val > maxW) maxW = val;
                     }
                     if (rpeSelect && rpeSelect.value) {
                         localStorage.setItem(`prev_rpe_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`, rpeSelect.value);
                     }
                 }
             });
+
+            const avgWeight = weightCount > 0 ? (totalWeight / weightCount).toFixed(1) : 0;
+            const history = JSON.parse(localStorage.getItem('machine_workout_history') || '[]');
+            
+            history.push({
+                date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                title: workout.title,
+                duration: document.getElementById('global-timer').textContent,
+                avgWeight: parseFloat(avgWeight),
+                maxWeight: maxW,
+                totalVolume: totalWeight
+            });
+
+            localStorage.setItem('machine_workout_history', JSON.stringify(history));
+        }
+
+        function setChartMetric(metric) {
+            currentChartMetric = metric;
+            const btnW = document.getElementById('btn-metric-weight');
+            const btnV = document.getElementById('btn-metric-volume');
+            if (metric === 'weight') {
+                btnW.className = "px-2.5 py-1 text-[10px] font-bold rounded bg-accent text-white transition-all";
+                btnV.className = "px-2.5 py-1 text-[10px] font-semibold rounded text-slate-400 hover:text-white transition-all";
+            } else {
+                btnV.className = "px-2.5 py-1 text-[10px] font-bold rounded bg-accent text-white transition-all";
+                btnW.className = "px-2.5 py-1 text-[10px] font-semibold rounded text-slate-400 hover:text-white transition-all";
+            }
+            loadStatsAndChart();
+        }
+
+        function loadStatsAndChart() {
+            const history = JSON.parse(localStorage.getItem('machine_workout_history') || '[]');
+            
+            // Calcul des KPIs
+            document.getElementById('kpi-total-sessions').textContent = history.length;
+            let absoluteMax = 0;
+            let sumAvg = 0;
+            history.forEach(item => {
+                if (item.maxWeight > absoluteMax) absoluteMax = item.maxWeight;
+                sumAvg += item.avgWeight;
+            });
+            const globalAvg = history.length > 0 ? (sumAvg / history.length).toFixed(1) : 0;
+
+            document.getElementById('kpi-max-weight').textContent = `${absoluteMax} kg`;
+            document.getElementById('kpi-global-avg').textContent = `${globalAvg} kg`;
+
+            // Remplir l'historique visuel détaillé
+            const historyListEl = document.getElementById('history-list');
+            if (history.length === 0) {
+                historyListEl.innerHTML = `<p class="text-slate-500 text-center py-4">Aucune séance enregistrée pour le moment.</p>`;
+            } else {
+                historyListEl.innerHTML = history.slice().reverse().map(item => `
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-white text-xs">${item.title}</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5">${item.date} • Durée : ${item.duration}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-accent">${item.avgWeight} kg moy.</span>
+                            <div class="text-[9px] text-slate-500">Max : ${item.maxWeight || 0} kg</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Générer le graphique Chart.js avec la métrique choisie
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const labels = history.map((item, idx) => `S#${idx + 1} (${item.date.split(' ')[0]})`);
+            const data = history.map(item => currentChartMetric === 'weight' ? item.avgWeight : (item.totalVolume || 0));
+            const labelText = currentChartMetric === 'weight' ? 'Moyenne des poids (kg)' : 'Volume total levé (kg)';
+
+            if (progressChartInstance) {
+                progressChartInstance.destroy();
+            }
+
+            progressChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelText,
+                        data: data,
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#3B82F6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94A3B8', font: { size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94A3B8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function clearHistoryData() {
+            showModal("Réinitialiser l'historique ?", "Êtes-vous sûr de vouloir effacer toutes vos données de suivi et statistiques ?", "fa-solid fa-triangle-exclamation text-danger", [
+                { label: "Annuler", class: "bg-slate-800 text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold border border-slate-700" },
+                { label: "Effacer", class: "bg-danger text-white px-4 py-2 rounded-lg text-xs font-bold", action: () => {
+                    localStorage.removeItem('machine_workout_history');
+                    loadStatsAndChart();
+                }}
+            ]);
         }
 
         function requestQuitWorkout() {
@@ -675,13 +902,15 @@
             document.getElementById('screen-workout').classList.add('hidden');
             document.getElementById('header-right').classList.add('hidden');
             document.getElementById('screen-dashboard').classList.remove('hidden');
+            document.getElementById('main-nav').classList.remove('hidden');
         }
 
         function requestFinishWorkout() {
             persistWorkoutResults();
             const timeStr = document.getElementById('global-timer').textContent;
-            showModal("Félicitations !", `Séance terminée en ${timeStr}. Vos performances et RPE ont été enregistrés pour vos prochaines séances !`, "fa-solid fa-trophy text-amber-400", [
-                { label: "Retour au tableau de bord", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold", action: quitWorkout }
+            showModal("Félicitations !", `Séance terminée en ${timeStr}. Vos performances ont été enregistrées dans l'historique et le graphique de suivi !`, "fa-solid fa-trophy text-amber-400", [
+                { label: "Voir le suivi & stats", class: "bg-accent text-white px-4 py-2 rounded-lg text-xs font-bold", action: () => { quitWorkout(); switchTab('stats'); } },
+                { label: "Tableau de bord", class: "bg-slate-800 text-slate-300 px-4 py-2 rounded-lg text-xs font-semibold border border-slate-700", action: quitWorkout }
             ]);
         }
     </script>
