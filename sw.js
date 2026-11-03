@@ -1,4 +1,4 @@
-const CACHE_NAME = 'machine-workout-v3';
+const CACHE_NAME = 'machine-workout-v4';
 const urlsToCache = [
     './',
     './index.html',
@@ -17,7 +17,7 @@ self.addEventListener('install', event => {
     self.skipWaiting();
 });
 
-// Activation et nettoyage immédiat des anciens caches pour éviter les conflits
+// Activation et nettoyage immédiat des anciens caches pour forcer la mise à jour sur iOS
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys => {
@@ -29,7 +29,7 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// Stratégie de récupération optimisée
+// Stratégie de récupération "Cache First" avec fallback réseau et cache dynamique des images/GIFs
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request).then(cachedResponse => {
