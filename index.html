@@ -248,4 +248,740 @@
             </div>
 
             <!-- BLOC ECHAUFFEMENT ARTICULAIRE GUIDÉ -->
-            <div id="articular-card" class="bg-cardbg border border-slate-700/80 rounded
+            <div id="articular-card" class="bg-cardbg border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-bone text-warning text-sm"></i>
+                        <h4 class="font-bold text-sm text-white">Étape 2 • Échauffement Articulaire & Mobilité</h4>
+                    </div>
+                    <span class="text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded border border-warning/20 font-semibold">Mobilisation</span>
+                </div>
+                <div id="articular-list" class="space-y-2 text-xs"></div>
+            </div>
+
+            <!-- EXERCICES DU PROGRAMME -->
+            <div id="exercises-container" class="space-y-6"></div>
+
+            <!-- BLOC ETIREMENTS FINAUX -->
+            <div id="stretching-card" class="bg-cardbg border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-child text-success text-sm"></i>
+                        <h4 class="font-bold text-sm text-white">Étape Finale • Étirements Spécifiques (30s)</h4>
+                    </div>
+                    <span class="text-[10px] bg-success/10 text-success px-2 py-0.5 rounded border border-success/20 font-semibold">Récupération</span>
+                </div>
+                <div id="stretching-list" class="space-y-2 text-xs"></div>
+            </div>
+
+            <!-- BOUTON TERMINER LA SÉANCE -->
+            <div class="pt-4">
+                <button onclick="requestFinishWorkout()" class="w-full bg-success hover:bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wide">
+                    <i class="fa-solid fa-circle-check text-base"></i> Terminer la séance
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- BARRE FLOTTANTE DU MINUTEUR DE REPOS / ETIREMENT -->
+    <div id="rest-timer-bar" class="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-accent/40 backdrop-blur-md p-3 z-40 transform translate-y-full transition-transform duration-300">
+        <div class="max-w-xl mx-auto flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center text-accent">
+                    <i class="fa-solid fa-stopwatch text-lg"></i>
+                </div>
+                <div>
+                    <div id="rest-label" class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Minuteur</div>
+                    <div id="rest-timer-display" class="text-2xl font-mono font-bold text-white">00:30</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="adjustRestTimer(-15)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700">-15s</button>
+                <button onclick="adjustRestTimer(15)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700">+15s</button>
+                <button onclick="stopRestTimer()" class="bg-accent hover:bg-accenthover text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE DE NOTIFICATION ET CONFIRMATION -->
+    <div id="custom-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 text-center">
+            <div id="modal-icon-container" class="w-12 h-12 rounded-full bg-accent/10 border border-accent/30 mx-auto flex items-center justify-center text-accent text-xl">
+                <i id="modal-icon" class="fa-solid fa-info"></i>
+            </div>
+            <h3 id="modal-title" class="font-bold text-lg text-white">Titre</h3>
+            <p id="modal-message" class="text-xs text-slate-300 leading-relaxed">Message explicatif...</p>
+            <div id="modal-actions" class="flex items-center justify-center gap-3 pt-2"></div>
+        </div>
+    </div>
+
+    <!-- SCRIPT APPLICATION ET ENREGISTREMENT DU SERVICE WORKER -->
+    <script>
+        // Enregistrement sécurisé du Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker enregistré !', reg.scope))
+                    .catch(err => console.log('Erreur SW :', err));
+            });
+        }
+
+        const workouts = [
+            {
+                title: "Haut du Corps (Épaules, Dos & Pecs)",
+                warmup: "10 min Rameur",
+                warmupIcon: "fa-solid fa-water-ladder",
+                articular: [
+                    { title: "Rotations d'épaules (15x)", desc: "Faire de grands cercles lents avec les bras vers l'avant puis vers l'arrière pour lubrifier l'articulation." },
+                    { title: "Rotateurs de la coiffe (12x)", desc: "Bras plié à 90 le long du corps, pivoter l'avant-bras vers l'intérieur et l'extérieur." },
+                    { title: "Moulinets légers de bras (10x)", desc: "Tendre les bras et effectuer des cercles amples et souples." },
+                    { title: "Flexions/Extensions des poignets (10x)", desc: "Fléchir et tendre doucement les poignets dans les deux sens pour éviter les tensions." }
+                ],
+                stretching: [
+                    { title: "Étirement grand dorsal - Bras droit (30s)", desc: "S'accrocher ou lever le bras droit tendu et s'incliner légèrement sur le côté gauche." },
+                    { title: "Étirement grand dorsal - Bras gauche (30s)", desc: "S'accrocher ou lever le bras gauche tendu et s'incliner légèrement sur le côté droit." },
+                    { title: "Étirement pectoraux - Côté droit (30s)", desc: "Placer l'avant-bras droit contre un montant et pivoter doucement le buste vers la gauche." },
+                    { title: "Étirement pectoraux - Côté gauche (30s)", desc: "Placer l'avant-bras gauche contre un montant et pivoter doucement le buste vers la droite." },
+                    { title: "Étirement épaules - Bras droit (30s)", desc: "Ramener le bras droit tendu devant la poitrine en le tirant doucement avec l'autre main." },
+                    { title: "Étirement épaules - Bras gauche (30s)", desc: "Ramener le bras gauche tendu devant la poitrine en le tirant doucement avec l'autre main." },
+                    { title: "Mobilité et détente de la nuque (30s)", desc: "Incliner doucement la tête sur les côtés et vers l'avant en relâchant les épaules." }
+                ],
+                exercises: [
+                    { name: "Tirage Vertical Poitrine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/11/tirage-vertical-poitrine.gif", desc: "Assis, calez les cuisses. Saisissez la barre prise large, tirez vers le haut de la poitrine en resserrant les omoplates." },
+                    { name: "Rowing Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif", desc: "Buste droit appuyé ou gainé, tirez la poignée vers le nombril en gardant les coudes proches du corps." },
+                    { name: "Développé Épaules à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif", desc: "Réglez le siège pour avoir les poignées au niveau des épaules. Poussez vers le haut sans bloquer les coudes." },
+                    { name: "Élévation Latérale à la Poulie en Inclinaison", sets: 3, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2025/11/elevation-laterale-a-la-poulie-en-inclinaison.gif", desc: "Buste légèrement incliné, montez la poignée latéralement jusqu'à la hauteur de l'épaule de façon fluide." },
+                    { name: "Pectoral à la Machine (Pec Deck / Butterfly)", sets: 3, reps: "12-15 reps", restSec: 120, image: "https://i.pinimg.com/originals/a2/12/cd/a212cde8804175ee82be3abe83ca51e3.gif", desc: "Assis le dos bien plaqué, resserrez les poignées devant vous en contractant le torse." }
+                ]
+            },
+            {
+                title: "Bras, Abdos & Lombaires",
+                warmup: "10 min Rameur",
+                warmupIcon: "fa-solid fa-water-ladder",
+                articular: [
+                    { title: "Rotations des poignets (15x)", desc: "Effectuer des cercles lents avec les poignets dans les deux sens." },
+                    { title: "Flexions douces des coudes (12x)", desc: "Plier et tendre les bras sans forcer pour lubrifier l'articulation." },
+                    { title: "Torsions contrôlées du buste (10x)", desc: "Pivoter doucement le haut du corps de gauche à droite, bras relâchés." },
+                    { title: "Flexions latérales du buste (10x)", desc: "Glisser la main le long de la cuisse sur le côté, sans pencher en avant." }
+                ],
+                stretching: [
+                    { title: "Étirement triceps - Bras droit (30s)", desc: "Lever le bras droit, plier le coude derrière la tête et pousser doucement avec la main gauche." },
+                    { title: "Étirement triceps - Bras gauche (30s)", desc: "Lever le bras gauche, plier le coude derrière la tête et pousser doucement avec la main droite." },
+                    { title: "Étirement biceps/avant-bras - Bras droit (30s)", desc: "Tendre le bras droit paume vers l'avant et tirer doucement les doigts vers soi." },
+                    { title: "Étirement biceps/avant-bras - Bras gauche (30s)", desc: "Tendre le bras gauche paume vers l'avant et tirer doucement les doigts vers soi." },
+                    { title: "Étirement abdominaux (phoque/cobra) (30s)", desc: "Allongé sur le ventre, redresser le buste en appui sur les mains en gardant le bassin au sol." },
+                    { title: "Étirement lombaires (genoux poitrine) (30s)", desc: "Couché sur le dos, ramener les genoux vers la poitrine et enrouler doucement le bas du dos." }
+                ],
+                exercises: [
+                    { name: "Machine Dips Assistée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/dips-assis-machine-matrix.gif", desc: "Mains sur les poignées, descendez en fléchissant les coudes à 90° puis poussez fort pour cibler les triceps." },
+                    { name: "Extension Triceps Poulie Haute à la Corde", sets: 4, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/extension-triceps-poulie-haute-corde.gif", desc: "Coudes collés aux côtes, poussez la corde vers le bas en écartant les extrémités en bas de mouvement." },
+                    { name: "Curl Biceps Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-pupitre-machine-prechargee.gif", desc: "Coudes calés sur le pupitre de la machine, fléchissez les bras pour contracter puissamment les biceps." },
+                    { name: "Crunch à la Machine", sets: 4, reps: "15-20 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/crunch-machine-abdos.gif", desc: "Saisissez les poignées et enroulez le buste vers le bas en contractant volontairement les abdominaux." },
+                    { name: "Extension Lombaire au Banc 45°", sets: 3, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/extension-lombaire-au-banc-45.gif", desc: "Bassin calé sur le boudin, descendez le buste puis remontez jusqu'à l'alignement du corps pour renforcer le bas du dos." }
+                ]
+            },
+            {
+                title: "Bas du Corps (Cuisses & Fessiers)",
+                warmup: "10 min Vélo",
+                warmupIcon: "fa-solid fa-person-biking",
+                articular: [
+                    { title: "Balancements de jambe (15x)", desc: "Se tenir à un support et balancer une jambe d'avant en arrière souplement." },
+                    { title: "Rotations des chevilles (12x)", desc: "Effectuer des cercles avec chaque pied pour préparer l'articulation." },
+                    { title: "Squats à vide (10x)", desc: "Fléchir les genoux en gardant le dos droit, sans charge, pour lubrifier les genoux." },
+                    { title: "Ouvertures de hanches (10x)", desc: "Monter le genou et l'ouvrir vers l'extérieur en décrivant un cercle." }
+                ],
+                stretching: [
+                    { title: "Étirement quadriceps - Jambe droite (30s)", desc: "Debout, attraper la cheville droite pour ramener le talon contre la fesse, genoux serrés." },
+                    { title: "Étirement quadriceps - Jambe gauche (30s)", desc: "Debout, attraper la cheville gauche pour ramener le talon contre la fesse, genoux serrés." },
+                    { title: "Étirement ischio-jambiers - Jambe droite (30s)", desc: "Poser le talon droit sur une surface surélevée, jambe tendue, et incliner le dos droit vers l'avant." },
+                    { title: "Étirement ischio-jambiers - Jambe gauche (30s)", desc: "Poser le talon gauche sur une surface surélevée, jambe tendue, et incliner le dos droit vers l'avant." },
+                    { title: "Étirement fessiers - Côté droit (30s)", desc: "Couché, croiser la cheville droite sur le genou gauche et tirer la cuisse vers soi." },
+                    { title: "Étirement fessiers - Côté gauche (30s)", desc: "Couché, croiser la cheville gauche sur le genou droit et tirer la cuisse vers soi." },
+                    { title: "Étirement adducteurs (papillon assis) (30s)", desc: "Assis, plantes de pieds collées, laisser descendre les genoux vers le sol en se tenant droit." }
+                ],
+                exercises: [
+                    { name: "Presse à Cuisses Inclinée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif", desc: "Pieds placés sur le plateau, poussez par les talons sans verrouiller brutalement les genoux." },
+                    { name: "Leg Extension (Quadriceps)", sets: 4, reps: "12-15 reps", restSec: 120, image: "https://i.pinimg.com/originals/2f/88/8a/2f888a80d3e49f5e31ee372116437540.gif", desc: "Dos bien appuyé au siège, tendez les jambes vers le haut en bloquant 1 seconde en contraction haute." },
+                    { name: "Leg Curl Assis (Ischio-Jambiers)", sets: 4, reps: "12-15 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/leg-curl-assis-machine.gif", desc: "Fléchissez les genoux pour ramener le boudin sous le siège de façon fluide et contrôlée." },
+                    { name: "Machine Hip Thrust (Fessiers)", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/hip-thrust-machine-leg-extension.gif", desc: "Cible N°1 du grand fessier : poussez le bassin vers le haut en contractant fort les fessiers en haut." },
+                    { name: "Machine Abducteurs", sets: 4, reps: "15-20 reps", restSec: 120, image: "https://i.pinimg.com/originals/a0/85/b9/a085b9cee9496d9f0c9e9aa733479bfb.gif", desc: "Écartez les cuisses contre les coussins pour travailler le haut/côté des fessiers (moyen fessier)." }
+                ]
+            }
+        ];
+
+        let activeWorkoutIndex = null;
+        let globalTimerInterval = null;
+        let globalStartTime = 0;
+        let warmupTimerInterval = null;
+        let warmupSecondsLeft = 600;
+        let restTimerInterval = null;
+        let restEndTime = 0;
+        let wakeLock = null;
+        let progressChartInstance = null;
+        let currentChartMetric = 'weight';
+
+        // Gestion des onglets
+        function switchTab(tabName) {
+            const dashScreen = document.getElementById('screen-dashboard');
+            const statsScreen = document.getElementById('screen-stats');
+            const btnDash = document.getElementById('nav-btn-dashboard');
+            const btnStats = document.getElementById('nav-btn-stats');
+
+            if (tabName === 'dashboard') {
+                dashScreen.classList.remove('hidden');
+                statsScreen.classList.add('hidden');
+                btnDash.className = "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-accent text-white shadow";
+                btnStats.className = "flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2";
+            } else {
+                dashScreen.classList.add('hidden');
+                statsScreen.classList.remove('hidden');
+                btnStats.className = "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-accent text-white shadow";
+                btnDash.className = "flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2";
+                loadStatsAndChart();
+            }
+        }
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    updateWakeStatus(true);
+                    wakeLock.addEventListener('release', () => updateWakeStatus(false));
+                }
+            } catch (err) {
+                updateWakeStatus(false);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release();
+                wakeLock = null;
+                updateWakeStatus(false);
+            }
+        }
+
+        function updateWakeStatus(active) {
+            const el = document.getElementById('wake-status');
+            if (active) {
+                el.innerHTML = '<i class="fa-solid fa-sun text-amber-400"></i> Écran maintenu allumé';
+                el.className = 'text-[9px] text-amber-400 flex items-center gap-1 mt-0.5 font-semibold';
+            } else {
+                el.innerHTML = '<i class="fa-solid fa-moon text-slate-500"></i> Veille normale';
+                el.className = 'text-[9px] text-slate-400 flex items-center gap-1 mt-0.5';
+            }
+        }
+
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+
+        function showModal(title, message, iconClass, buttons) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-icon').className = iconClass;
+            const actionsDiv = document.getElementById('modal-actions');
+            actionsDiv.innerHTML = '';
+            buttons.forEach(btn => {
+                const buttonEl = document.createElement('button');
+                buttonEl.textContent = btn.label;
+                buttonEl.className = btn.class || "bg-accent text-white px-4 py-2 rounded-lg text-xs font-bold";
+                buttonEl.onclick = () => { closeModal(); if (btn.action) btn.action(); };
+                actionsDiv.appendChild(buttonEl);
+            });
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        async function startWorkout(index) {
+            activeWorkoutIndex = index;
+            const workout = workouts[index];
+
+            document.getElementById('screen-dashboard').classList.add('hidden');
+            document.getElementById('screen-stats').classList.add('hidden');
+            document.getElementById('main-nav').classList.add('hidden');
+            document.getElementById('screen-workout').classList.remove('hidden');
+            document.getElementById('header-right').classList.remove('hidden');
+            document.getElementById('header-right').classList.add('flex');
+
+            document.getElementById('warmup-title').textContent = workout.warmup;
+            document.getElementById('warmup-icon').className = workout.warmupIcon;
+
+            // Remplir les listes d'échauffement articulaire
+            const artContainer = document.getElementById('articular-list');
+            artContainer.innerHTML = workout.articular.map((item) => `
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
+                    <div class="flex-1 pr-2">
+                        <div class="font-bold text-white text-xs">${item.title}</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">${item.desc}</div>
+                    </div>
+                    <div onclick="toggleCheckItemParent(this)" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 flex items-center justify-center transition-colors check-btn cursor-pointer shrink-0">
+                        <i class="fa-solid fa-check text-sm"></i>
+                    </div>
+                </div>
+            `).join('');
+
+            // Remplir les étirements finaux
+            const stretchContainer = document.getElementById('stretching-list');
+            stretchContainer.innerHTML = workout.stretching.map((item) => `
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between text-slate-300">
+                    <div class="flex-1 pr-2">
+                        <div class="font-bold text-white text-xs">${item.title}</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">${item.desc}</div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="startRestTimer(30, 'Étirement (30s)')" class="px-2.5 py-1.5 rounded-lg bg-success/10 hover:bg-success/20 text-success text-[11px] font-bold border border-success/30 flex items-center gap-1 transition-colors">
+                            <i class="fa-solid fa-stopwatch"></i> 30s
+                        </button>
+                        <div onclick="toggleCheckItemParent(this)" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 flex items-center justify-center transition-colors check-btn cursor-pointer">
+                            <i class="fa-solid fa-check text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const container = document.getElementById('exercises-container');
+            container.innerHTML = workout.exercises.map((ex, exIdx) => renderExerciseCard(ex, exIdx)).join('');
+
+            loadSavedData();
+            startGlobalTimer();
+            await requestWakeLock();
+        }
+
+        function toggleCheckItemParent(btnElement) {
+            btnElement.classList.toggle('bg-success');
+            btnElement.classList.toggle('text-white');
+            btnElement.classList.toggle('border-success');
+            const parentRow = btnElement.closest('div.bg-slate-900\\/60');
+            if (parentRow) {
+                parentRow.classList.toggle('border-success/50');
+            }
+        }
+
+        function renderExerciseCard(ex, exIdx) {
+            let setsRows = '';
+            for (let s = 1; s <= ex.sets; s++) {
+                const prevValKey = `prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`;
+                const prevRpeKey = `prev_rpe_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`;
+                const prevVal = localStorage.getItem(prevValKey) || '--';
+                const prevRpe = localStorage.getItem(prevRpeKey) || '-';
+
+                setsRows += `
+                    <div class="flex flex-col gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-400 w-12">Série ${s}</span>
+                                <span class="text-[10px] text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded border border-slate-700/60 flex items-center gap-1.5">
+                                    Précédent: <strong class="text-white">${prevVal} kg</strong> <span class="text-warning">(RPE ${prevRpe})</span>
+                                </span>
+                            </div>
+                            <span class="text-xs font-medium text-slate-300">${ex.reps}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
+                            <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                                <input type="number" step="2.5" placeholder="0" id="w_${exIdx}_${s}" onchange="saveCurrentWeight(${exIdx}, ${s}, this.value)" class="w-12 bg-transparent text-center font-bold text-sm text-accent focus:outline-none">
+                                <span class="text-[10px] text-slate-400 font-semibold">kg</span>
+                            </div>
+
+                            <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                                <span class="text-[10px] text-slate-400 font-bold">RPE</span>
+                                <select id="rpe_${exIdx}_${s}" onchange="saveCurrentRPE(${exIdx}, ${s}, this.value)" class="bg-transparent text-xs text-warning font-bold focus:outline-none cursor-pointer">
+                                    <option value="" class="bg-slate-900 text-slate-400">-</option>
+                                    <option value="6" class="bg-slate-900 text-emerald-400">6 (Facile)</option>
+                                    <option value="7" class="bg-slate-900 text-emerald-400">7 (Modéré)</option>
+                                    <option value="8" class="bg-slate-900 text-warning">8 (Bon effort)</option>
+                                    <option value="9" class="bg-slate-900 text-amber-500">9 (Très dur)</option>
+                                    <option value="10" class="bg-slate-900 text-danger">10 (Échec)</option>
+                                </select>
+                            </div>
+
+                            <button onclick="completeSet(this, ${ex.restSec}, ${exIdx}, ${s})" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-500 hover:text-success border border-slate-700 flex items-center justify-center transition-colors check-btn">
+                                <i class="fa-solid fa-check text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const isLastEx = exIdx === workouts[activeWorkoutIndex].exercises.length - 1;
+            const exerciseRestBtn = !isLastEx ? `
+                <div class="pt-2">
+                    <button onclick="startRestTimer(180, 'Repos entre exercices (3 min)')" class="w-full bg-slate-800 hover:bg-slate-700 text-accent border border-accent/40 rounded-xl py-2.5 text-xs font-bold transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-clock"></i> Lancer le repos de 3 min avant l'exercice suivant
+                    </button>
+                </div>
+            ` : '';
+
+            return `
+                <div class="bg-cardbg border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl">
+                    <div class="h-52 bg-slate-900 relative">
+                        <img src="${ex.image}" alt="${ex.name}" class="w-full h-full object-cover opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-cardbg via-transparent to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 right-4">
+                            <span class="text-[10px] uppercase font-bold text-accent bg-accent/20 px-2 py-0.5 rounded border border-accent/30 backdrop-blur-sm">Machine / Poulie</span>
+                            <h4 class="font-bold text-base text-white mt-1 drop-shadow-md">${ex.name}</h4>
+                        </div>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <p class="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-2.5 rounded-xl border border-slate-800">${ex.desc}</p>
+                        <div class="space-y-2">${setsRows}</div>
+                        ${exerciseRestBtn}
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGlobalTimer() {
+            globalStartTime = Date.now();
+            clearInterval(globalTimerInterval);
+            globalTimerInterval = setInterval(() => {
+                const elapsedSec = Math.floor((Date.now() - globalStartTime) / 1000);
+                const hrs = Math.floor(elapsedSec / 3600);
+                const mins = Math.floor((elapsedSec % 3600) / 60);
+                const secs = elapsedSec % 60;
+                document.getElementById('global-timer').textContent = 
+                    `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function toggleWarmupTimer() {
+            const btn = document.getElementById('warmup-start-btn');
+            if (warmupTimerInterval) {
+                clearInterval(warmupTimerInterval);
+                warmupTimerInterval = null;
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> Reprendre';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+                warmupTimerInterval = setInterval(() => {
+                    if (warmupSecondsLeft > 0) {
+                        warmupSecondsLeft--;
+                        updateWarmupDisplay();
+                    } else {
+                        clearInterval(warmupTimerInterval);
+                        warmupTimerInterval = null;
+                        showModal("Échauffement terminé !", "Passez aux mouvements d'échauffement articulaire.", "fa-solid fa-circle-check text-success", [{ label: "Compris !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold" }]);
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetWarmupTimer() {
+            clearInterval(warmupTimerInterval);
+            warmupTimerInterval = null;
+            warmupSecondsLeft = 600;
+            updateWarmupDisplay();
+            document.getElementById('warmup-start-btn').innerHTML = '<i class="fa-solid fa-play"></i> Démarrer';
+        }
+
+        function updateWarmupDisplay() {
+            const m = Math.floor(warmupSecondsLeft / 60);
+            const s = warmupSecondsLeft % 60;
+            document.getElementById('warmup-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function completeSet(btn, restSec, exIdx, s) {
+            btn.classList.toggle('bg-success');
+            btn.classList.toggle('text-white');
+            btn.classList.toggle('border-success');
+            if (btn.classList.contains('bg-success')) {
+                startRestTimer(restSec, `Temps de repos (2 min - Série ${s})`);
+            }
+        }
+
+        function startRestTimer(seconds, labelText = 'Temps de repos') {
+            restEndTime = Date.now() + (seconds * 1000);
+            document.getElementById('rest-label').textContent = labelText;
+            updateRestDisplay();
+            document.getElementById('rest-timer-bar').classList.remove('translate-y-full');
+            clearInterval(restTimerInterval);
+            restTimerInterval = setInterval(() => {
+                const timeLeft = Math.ceil((restEndTime - Date.now()) / 1000);
+                if (timeLeft > 0) {
+                    const m = Math.floor(timeLeft / 60);
+                    const s = timeLeft % 60;
+                    document.getElementById('rest-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                } else {
+                    stopRestTimer();
+                }
+            }, 1000);
+        }
+
+        function adjustRestTimer(amount) {
+            restEndTime += (amount * 1000);
+            updateRestDisplay();
+        }
+
+        function stopRestTimer() {
+            clearInterval(restTimerInterval);
+            restTimerInterval = null;
+            document.getElementById('rest-timer-bar').classList.add('translate-y-full');
+        }
+
+        function updateRestDisplay() {
+            const timeLeft = Math.max(0, Math.ceil((restEndTime - Date.now()) / 1000));
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.getElementById('rest-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function saveCurrentWeight(exIdx, setNum, value) {
+            localStorage.setItem(`temp_w_${activeWorkoutIndex}_${exIdx}_${setNum}`, value);
+        }
+
+        function saveCurrentRPE(exIdx, setNum, value) {
+            localStorage.setItem(`temp_rpe_${activeWorkoutIndex}_${exIdx}_${setNum}`, value);
+        }
+
+        function loadSavedData() {
+            const workout = workouts[activeWorkoutIndex];
+            workout.exercises.forEach((ex, exIdx) => {
+                for (let s = 1; s <= ex.sets; s++) {
+                    const savedW = localStorage.getItem(`temp_w_${activeWorkoutIndex}_${exIdx}_${s}`);
+                    if (savedW) {
+                        const input = document.getElementById(`w_${exIdx}_${s}`);
+                        if (input) input.value = savedW;
+                    }
+                    const savedRpe = localStorage.getItem(`temp_rpe_${activeWorkoutIndex}_${exIdx}_${s}`);
+                    if (savedRpe) {
+                        const select = document.getElementById(`rpe_${exIdx}_${s}`);
+                        if (select) select.value = savedRpe;
+                    }
+                }
+            });
+        }
+
+        function persistWorkoutResults() {
+            const workout = workouts[activeWorkoutIndex];
+            let totalWeight = 0;
+            let weightCount = 0;
+            let maxW = 0;
+
+            workout.exercises.forEach((ex, exIdx) => {
+                for (let s = 1; s <= ex.sets; s++) {
+                    const wInput = document.getElementById(`w_${exIdx}_${s}`);
+                    const rpeSelect = document.getElementById(`rpe_${exIdx}_${s}`);
+                    if (wInput && wInput.value) {
+                        const val = parseFloat(wInput.value);
+                        localStorage.setItem(`prev_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`, val);
+                        totalWeight += val;
+                        weightCount++;
+                        if (val > maxW) maxW = val;
+                    }
+                    if (rpeSelect && rpeSelect.value) {
+                        localStorage.setItem(`prev_rpe_workout_${activeWorkoutIndex}_ex_${exIdx}_set_${s}`, rpeSelect.value);
+                    }
+                }
+            });
+
+            const avgWeight = weightCount > 0 ? (totalWeight / weightCount).toFixed(1) : 0;
+            const history = JSON.parse(localStorage.getItem('machine_workout_history') || '[]');
+            
+            history.push({
+                date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                title: workout.title,
+                duration: document.getElementById('global-timer').textContent,
+                avgWeight: parseFloat(avgWeight),
+                maxWeight: maxW,
+                totalVolume: totalWeight
+            });
+
+            localStorage.setItem('machine_workout_history', JSON.stringify(history));
+        }
+
+        function setChartMetric(metric) {
+            currentChartMetric = metric;
+            const btnW = document.getElementById('btn-metric-weight');
+            const btnV = document.getElementById('btn-metric-volume');
+            if (metric === 'weight') {
+                btnW.className = "px-2.5 py-1 text-[10px] font-bold rounded bg-accent text-white transition-all";
+                btnV.className = "px-2.5 py-1 text-[10px] font-semibold rounded text-slate-400 hover:text-white transition-all";
+            } else {
+                btnV.className = "px-2.5 py-1 text-[10px] font-bold rounded bg-accent text-white transition-all";
+                btnW.className = "px-2.5 py-1 text-[10px] font-semibold rounded text-slate-400 hover:text-white transition-all";
+            }
+            loadStatsAndChart();
+        }
+
+        function loadStatsAndChart() {
+            const history = JSON.parse(localStorage.getItem('machine_workout_history') || '[]');
+            
+            document.getElementById('kpi-total-sessions').textContent = history.length;
+            let absoluteMax = 0;
+            let sumAvg = 0;
+            history.forEach(item => {
+                if (item.maxWeight > absoluteMax) absoluteMax = item.maxWeight;
+                sumAvg += item.avgWeight;
+            });
+            const globalAvg = history.length > 0 ? (sumAvg / history.length).toFixed(1) : 0;
+
+            document.getElementById('kpi-max-weight').textContent = `${absoluteMax} kg`;
+            document.getElementById('kpi-global-avg').textContent = `${globalAvg} kg`;
+
+            const historyListEl = document.getElementById('history-list');
+            if (history.length === 0) {
+                historyListEl.innerHTML = `<p class="text-slate-500 text-center py-4">Aucune séance enregistrée pour le moment.</p>`;
+            } else {
+                historyListEl.innerHTML = history.slice().reverse().map(item => `
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-white text-xs">${item.title}</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5">${item.date} • Durée : ${item.duration}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-accent">${item.avgWeight} kg moy.</span>
+                            <div class="text-[9px] text-slate-500">Max : ${item.maxWeight || 0} kg</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const labels = history.map((item, idx) => `S#${idx + 1} (${item.date.split(' ')[0]})`);
+            const data = history.map(item => currentChartMetric === 'weight' ? item.avgWeight : (item.totalVolume || 0));
+            const labelText = currentChartMetric === 'weight' ? 'Moyenne des poids (kg)' : 'Volume total levé (kg)';
+
+            if (progressChartInstance) {
+                progressChartInstance.destroy();
+            }
+
+            progressChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelText,
+                        data: data,
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#3B82F6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94A3B8', font: { size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94A3B8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- GESTION IMPORT / EXPORT JSON (Compatible iPhone PWA & Navigateur) ---
+        async function exportDataJSON() {
+            const dataToExport = {
+                history: JSON.parse(localStorage.getItem('machine_workout_history') || '[]'),
+                localStorageBackup: { ...localStorage },
+                exportDate: new Date().toISOString()
+            };
+            
+            const jsonString = JSON.stringify(dataToExport, null, 2);
+            const fileName = `machine_workout_backup_${new Date().toISOString().slice(0, 10)}.json`;
+
+            if (navigator.canShare && navigator.canShare({ files: [new File([jsonString], fileName, { type: 'application/json' })] })) {
+                try {
+                    const file = new File([jsonString], fileName, { type: 'application/json' });
+                    await navigator.share({
+                        files: [file],
+                        title: 'Sauvegarde Machine Workout',
+                        text: 'Voici le fichier de sauvegarde JSON de tes entraînements.'
+                    });
+                    return;
+                } catch (error) {
+                    if (error.name === 'AbortError') return;
+                }
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonString);
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importDataJSON(event) {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        if (importedData.history) {
+                            localStorage.setItem('machine_workout_history', JSON.stringify(importedData.history));
+                        }
+                        if (importedData.localStorageBackup) {
+                            for (const [key, value] of Object.entries(importedData.localStorageBackup)) {
+                                localStorage.setItem(key, value);
+                            }
+                        }
+                        showModal("Importation réussie", "Vos données et votre historique ont bien été restaurés !", "fa-solid fa-circle-check text-success", [
+                            { label: "Parfait !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold", action: loadStatsAndChart }
+                        ]);
+                    } catch (error) {
+                        showModal("Erreur", "Le fichier JSON est invalide ou corrompu.", "fa-solid fa-triangle-exclamation text-danger", [
+                            { label: "Fermer", class: "bg-slate-800 text-slate-300 px-4 py-2 rounded-lg text-xs font-semibold" }
+                        ]);
+                    }
+                };
+            }
+        }
+
+        function clearHistoryData() {
+            showModal("Réinitialiser l'historique ?", "Êtes-vous sûr de vouloir effacer toutes vos données de suivi et statistiques ?", "fa-solid fa-triangle-exclamation text-danger", [
+                { label: "Annuler", class: "bg-slate-800 text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold border border-slate-700" },
+                { label: "Effacer", class: "bg-danger text-white px-4 py-2 rounded-lg text-xs font-bold", action: () => {
+                    localStorage.removeItem('machine_workout_history');
+                    loadStatsAndChart();
+                }}
+            ]);
+        }
+
+        function requestQuitWorkout() {
+            showModal("Quitter la séance ?", "Êtes-vous sûr de vouloir interrompre la séance en cours ?", "fa-solid fa-triangle-exclamation text-warning", [
+                { label: "Annuler", class: "bg-slate-800 text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold border border-slate-700" },
+                { label: "Quitter", class: "bg-danger text-white px-4 py-2 rounded-lg text-xs font-bold", action: quitWorkout }
+            ]);
+        }
+
+        function quitWorkout() {
+            clearInterval(globalTimerInterval);
+            clearInterval(warmupTimerInterval);
+            stopRestTimer();
+            releaseWakeLock();
+            document.getElementById('screen-workout').classList.add('hidden');
+            document.getElementById('header-right').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.remove('hidden');
+            document.getElementById('main-nav').classList.remove('hidden');
+        }
+
+        function requestFinishWorkout() {
+            persistWorkoutResults();
+            const timeStr = document.getElementById('global-timer').textContent;
+            showModal("Félicitations !", `Séance terminée en ${timeStr}. Vos performances ont été enregistrées dans l'historique et le graphique de suivi !`, "fa-solid fa-trophy text-amber-400", [
+                { label: "Voir le suivi & stats", class: "bg-accent text-white px-4 py-2 rounded-lg text-xs font-bold", action: () => { quitWorkout(); switchTab('stats'); } },
+                { label: "Tableau de bord", class: "bg-slate-800 text-slate-300 px-4 py-2 rounded-lg text-xs font-semibold border border-slate-700", action: quitWorkout }
+            ]);
+        }
+    </script>
+</body>
+</html>
