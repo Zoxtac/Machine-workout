@@ -95,7 +95,7 @@
             <div class="bg-cardbg border border-cardborder rounded-2xl p-4 text-center">
                 <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Programme d'entraînement</p>
                 <h2 class="text-xl font-bold text-white mt-1">Sélectionnez votre séance du jour</h2>
-                <p class="text-xs text-slate-400 mt-1">100% Hors-ligne • GIFs & Données en cache local</p>
+                <p class="text-xs text-slate-400 mt-1">100% Hors-ligne • Haptique & Graphiques par séance</p>
             </div>
 
             <div class="grid gap-4">
@@ -158,12 +158,12 @@
             </div>
         </div>
 
-        <!-- ECRAN STATS / SUIVI AMÉLIORÉ AVEC IMPORT/EXPORT -->
+        <!-- ECRAN STATS / SUIVI AMÉLIORÉ -->
         <div id="screen-stats" class="hidden space-y-6">
             <div class="bg-cardbg border border-cardborder rounded-2xl p-4 text-center">
                 <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Analyse de progression</p>
                 <h2 class="text-xl font-bold text-white mt-1">Suivi de vos performances</h2>
-                <p class="text-xs text-slate-400 mt-1">Vue d'ensemble et gestion des données</p>
+                <p class="text-xs text-slate-400 mt-1">Synthèse hebdomadaire et graphiques filtrables</p>
             </div>
 
             <!-- BOUTONS IMPORT / EXPORT JSON -->
@@ -177,31 +177,41 @@
                 </label>
             </div>
 
-            <!-- GRILLES DE STATS / KPIS -->
+            <!-- SYNTHÈSE HEBDOMADAIRE & KPIS -->
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-cardbg border border-cardborder rounded-2xl p-3 text-center shadow-md">
-                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Séances</div>
-                    <div id="kpi-total-sessions" class="text-lg font-bold text-white mt-1">0</div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Cette Semaine</div>
+                    <div id="kpi-weekly-count" class="text-lg font-bold text-success mt-1">0 / 3</div>
                 </div>
                 <div class="bg-cardbg border border-cardborder rounded-2xl p-3 text-center shadow-md">
                     <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Max Poids</div>
                     <div id="kpi-max-weight" class="text-lg font-bold text-accent mt-1">0 kg</div>
                 </div>
                 <div class="bg-cardbg border border-cardborder rounded-2xl p-3 text-center shadow-md">
-                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Moyenne Globale</div>
-                    <div id="kpi-global-avg" class="text-lg font-bold text-success mt-1">0 kg</div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Séances</div>
+                    <div id="kpi-total-sessions" class="text-lg font-bold text-white mt-1">0</div>
                 </div>
             </div>
 
-            <!-- CARTE GRAPHIQUE AVEC FILTRE -->
+            <!-- CARTE GRAPHIQUE AVEC FILTRE PAR SÉANCE -->
             <div class="bg-cardbg border border-cardborder rounded-2xl p-4 shadow-xl space-y-3">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-accent"></i> Évolution des performances
+                        <i class="fa-solid fa-chart-line text-accent"></i> Évolution
                     </h3>
-                    <div class="flex bg-black/60 rounded-lg p-1 border border-cardborder">
-                        <button onclick="setChartMetric('weight')" id="btn-metric-weight" class="px-2.5 py-1 text-[10px] font-bold rounded bg-accent text-white transition-all">Poids moy.</button>
-                        <button onclick="setChartMetric('volume')" id="btn-metric-volume" class="px-2.5 py-1 text-[10px] font-semibold rounded text-slate-400 hover:text-white transition-all">Volume</button>
+                    <div class="flex items-center gap-2">
+                        <!-- Sélecteur de programme -->
+                        <select id="chart-prog-filter" onchange="loadStatsAndChart()" class="bg-black/60 text-xs text-slate-200 font-semibold px-2.5 py-1 rounded-lg border border-cardborder focus:outline-none cursor-pointer">
+                            <option value="all">Toutes les séances</option>
+                            <option value="Haut du Corps">Haut du Corps</option>
+                            <option value="Bras, Abdos">Bras, Abdos & Lombaires</option>
+                            <option value="Bas du Corps">Bas du Corps</option>
+                        </select>
+                        <!-- Sélecteur métrique -->
+                        <div class="flex bg-black/60 rounded-lg p-0.5 border border-cardborder">
+                            <button onclick="setChartMetric('weight')" id="btn-metric-weight" class="px-2.5 py-1 text-[10px] font-bold rounded bg-accent text-white transition-all">Poids</button>
+                            <button onclick="setChartMetric('volume')" id="btn-metric-volume" class="px-2.5 py-1 text-[10px] font-semibold rounded text-slate-400 hover:text-white transition-all">Volume</button>
+                        </div>
                     </div>
                 </div>
                 <div class="relative h-60 w-full">
@@ -217,9 +227,7 @@
                     </h3>
                     <button onclick="clearHistoryData()" class="text-[10px] text-slate-500 hover:text-danger transition-colors">Réinitialiser</button>
                 </div>
-                <div id="history-list" class="space-y-2 text-xs">
-                    <!-- Rempli dynamiquement -->
-                </div>
+                <div id="history-list" class="space-y-2 text-xs"></div>
             </div>
         </div>
 
@@ -318,15 +326,19 @@
         </div>
     </div>
 
-    <!-- SCRIPT APPLICATION ET ENREGISTREMENT DU SERVICE WORKER -->
+    <!-- SCRIPT APPLICATION ET LOGIQUE HAPTIQUE / 1RM / SYNTHÈSE -->
     <script>
-        // Enregistrement sécurisé du Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker enregistré !', reg.scope))
-                    .catch(err => console.log('Erreur SW :', err));
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('Erreur SW :', err));
             });
+        }
+
+        // Fonction de vibration haptique sécurisée
+        function triggerHaptic(duration = 40) {
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate(duration); } catch(e) {}
+            }
         }
 
         const workouts = [
@@ -335,26 +347,26 @@
                 warmup: "10 min Rameur",
                 warmupIcon: "fa-solid fa-water-ladder",
                 articular: [
-                    { title: "Rotations d'épaules (15x)", desc: "Faire de grands cercles lents avec les bras vers l'avant puis vers l'arrière pour lubrifier l'articulation." },
+                    { title: "Rotations d'épaules (15x)", desc: "Faire de grands cercles lents avec les bras vers l'avant puis vers l'arrière." },
                     { title: "Rotateurs de la coiffe (12x)", desc: "Bras plié à 90 le long du corps, pivoter l'avant-bras vers l'intérieur et l'extérieur." },
                     { title: "Moulinets légers de bras (10x)", desc: "Tendre les bras et effectuer des cercles amples et souples." },
-                    { title: "Flexions/Extensions des poignets (10x)", desc: "Fléchir et tendre doucement les poignets dans les deux sens pour éviter les tensions." }
+                    { title: "Flexions/Extensions des poignets (10x)", desc: "Fléchir et tendre doucement les poignets dans les deux sens." }
                 ],
                 stretching: [
-                    { title: "Étirement grand dorsal - Bras droit (30s)", desc: "S'accrocher ou lever le bras droit tendu et s'incliner légèrement sur le côté gauche." },
-                    { title: "Étirement grand dorsal - Bras gauche (30s)", desc: "S'accrocher ou lever le bras gauche tendu et s'incliner légèrement sur le côté droit." },
-                    { title: "Étirement pectoraux - Côté droit (30s)", desc: "Placer l'avant-bras droit contre un montant et pivoter doucement le buste vers la gauche." },
-                    { title: "Étirement pectoraux - Côté gauche (30s)", desc: "Placer l'avant-bras gauche contre un montant et pivoter doucement le buste vers la droite." },
-                    { title: "Étirement épaules - Bras droit (30s)", desc: "Ramener le bras droit tendu devant la poitrine en le tirant doucement avec l'autre main." },
-                    { title: "Étirement épaules - Bras gauche (30s)", desc: "Ramener le bras gauche tendu devant la poitrine en le tirant doucement avec l'autre main." },
-                    { title: "Mobilité et détente de la nuque (30s)", desc: "Incliner doucement la tête sur les côtés et vers l'avant en relâchant les épaules." }
+                    { title: "Étirement grand dorsal - Bras droit (30s)", desc: "S'accrocher ou lever le bras droit tendu et s'incliner à gauche." },
+                    { title: "Étirement grand dorsal - Bras gauche (30s)", desc: "S'accrocher ou lever le bras gauche tendu et s'incliner à droite." },
+                    { title: "Étirement pectoraux - Côté droit (30s)", desc: "Placer l'avant-bras droit contre un montant et pivoter le buste." },
+                    { title: "Étirement pectoraux - Côté gauche (30s)", desc: "Placer l'avant-bras gauche contre un montant et pivoter le buste." },
+                    { title: "Étirement épaules - Bras droit (30s)", desc: "Ramener le bras droit devant la poitrine en le tirant doucement." },
+                    { title: "Étirement épaules - Bras gauche (30s)", desc: "Ramener le bras gauche devant la poitrine en le tirant doucement." },
+                    { title: "Mobilité et détente de la nuque (30s)", desc: "Incliner doucement la tête sur les côtés et vers l'avant." }
                 ],
                 exercises: [
-                    { name: "Tirage Vertical Poitrine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/11/tirage-vertical-poitrine.gif", desc: "Assis, calez les cuisses. Saisissez la barre prise large, tirez vers le haut de la poitrine en resserrant les omoplates." },
-                    { name: "Rowing Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif", desc: "Buste droit appuyé ou gainé, tirez la poignée vers le nombril en gardant les coudes proches du corps." },
-                    { name: "Développé Épaules à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif", desc: "Réglez le siège pour avoir les poignées au niveau des épaules. Poussez vers le haut sans bloquer les coudes." },
-                    { name: "Élévation Latérale à la Poulie en Inclinaison", sets: 3, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2025/11/elevation-laterale-a-la-poulie-en-inclinaison.gif", desc: "Buste légèrement incliné, montez la poignée latéralement jusqu'à la hauteur de l'épaule de façon fluide." },
-                    { name: "Pectoral à la Machine (Pec Deck / Butterfly)", sets: 3, reps: "12-15 reps", restSec: 90, image: "https://i.pinimg.com/originals/a2/12/cd/a212cde8804175ee82be3abe83ca51e3.gif", desc: "Assis le dos bien plaqué, resserrez les poignées devant vous en contractant le torse." }
+                    { name: "Tirage Vertical Poitrine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/11/tirage-vertical-poitrine.gif", desc: "Assis, calez les cuisses. Saisissez la barre prise large, tirez vers le haut de la poitrine." },
+                    { name: "Rowing Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif", desc: "Buste droit appuyé ou gainé, tirez la poignée vers le nombril." },
+                    { name: "Développé Épaules à la Machine", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif", desc: "Réglez le siège pour avoir les poignées au niveau des épaules. Poussez vers le haut." },
+                    { name: "Élévation Latérale à la Poulie en Inclinaison", sets: 3, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2025/11/elevation-laterale-a-la-poulie-en-inclinaison.gif", desc: "Buste légèrement incliné, montez la poignée latéralement jusqu'à la hauteur de l'épaule." },
+                    { name: "Pectoral à la Machine (Pec Deck / Butterfly)", sets: 3, reps: "12-15 reps", restSec: 90, image: "https://i.pinimg.com/originals/a2/12/cd/a212cde8804175ee82be3abe83ca51e3.gif", desc: "Assis le dos bien plaqué, resserrez les poignées devant vous." }
                 ]
             },
             {
@@ -364,23 +376,23 @@
                 articular: [
                     { title: "Rotations des poignets (15x)", desc: "Effectuer des cercles lents avec les poignets dans les deux sens." },
                     { title: "Flexions douces des coudes (12x)", desc: "Plier et tendre les bras sans forcer pour lubrifier l'articulation." },
-                    { title: "Torsions contrôlées du buste (10x)", desc: "Pivoter doucement le haut du corps de gauche à droite, bras relâchés." },
-                    { title: "Flexions latérales du buste (10x)", desc: "Glisser la main le long de la cuisse sur le côté, sans pencher en avant." }
+                    { title: "Torsions contrôlées du buste (10x)", desc: "Pivoter doucement le haut du corps de gauche à droite." },
+                    { title: "Flexions latérales du buste (10x)", desc: "Glisser la main le long de la cuisse sur le côté." }
                 ],
                 stretching: [
-                    { title: "Étirement triceps - Bras droit (30s)", desc: "Lever le bras droit, plier le coude derrière la tête et pousser doucement avec la main gauche." },
-                    { title: "Étirement triceps - Bras gauche (30s)", desc: "Lever le bras gauche, plier le coude derrière la tête et pousser doucement avec la main droite." },
-                    { title: "Étirement biceps/avant-bras - Bras droit (30s)", desc: "Tendre le bras droit paume vers l'avant et tirer doucement les doigts vers soi." },
-                    { title: "Étirement biceps/avant-bras - Bras gauche (30s)", desc: "Tendre le bras gauche paume vers l'avant et tirer doucement les doigts vers soi." },
-                    { title: "Étirement abdominaux (phoque/cobra) (30s)", desc: "Allongé sur le ventre, redresser le buste en appui sur les mains en gardant le bassin au sol." },
-                    { title: "Étirement lombaires (genoux poitrine) (30s)", desc: "Couché sur le dos, ramener les genoux vers la poitrine et enrouler doucement le bas du dos." }
+                    { title: "Étirement triceps - Bras droit (30s)", desc: "Lever le bras droit, plier le coude derrière la tête." },
+                    { title: "Étirement triceps - Bras gauche (30s)", desc: "Lever le bras gauche, plier le coude derrière la tête." },
+                    { title: "Étirement biceps/avant-bras - Bras droit (30s)", desc: "Tendre le bras droit paume vers l'avant et tirer les doigts vers soi." },
+                    { title: "Étirement biceps/avant-bras - Bras gauche (30s)", desc: "Tendre le bras gauche paume vers l'avant et tirer les doigts vers soi." },
+                    { title: "Étirement abdominaux (phoque/cobra) (30s)", desc: "Allongé sur le ventre, redresser le buste en appui sur les mains." },
+                    { title: "Étirement lombaires (genoux poitrine) (30s)", desc: "Couché sur le dos, ramener les genoux vers la poitrine." }
                 ],
                 exercises: [
-                    { name: "Machine Dips Assistée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/dips-assis-machine-matrix.gif", desc: "Mains sur les poignées, descendez en fléchissant les coudes à 90° puis poussez fort pour cibler les triceps." },
-                    { name: "Extension Triceps Poulie Haute à la Corde", sets: 4, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/extension-triceps-poulie-haute-corde.gif", desc: "Coudes collés aux côtes, poussez la corde vers le bas en écartant les extrémités en bas de mouvement." },
-                    { name: "Curl Biceps Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-pupitre-machine-prechargee.gif", desc: "Coudes calés sur le pupitre de la machine, fléchissez les bras pour contracter puissamment les biceps." },
-                    { name: "Crunch à la Machine", sets: 4, reps: "15-20 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/crunch-machine-abdos.gif", desc: "Saisissez les poignées et enroulez le buste vers le bas en contractant volontairement les abdominaux." },
-                    { name: "Extension Lombaire au Banc 45°", sets: 3, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/extension-lombaire-au-banc-45.gif", desc: "Bassin calé sur le boudin, descendez le buste puis remontez jusqu'à l'alignement du corps pour renforcer le bas du dos." }
+                    { name: "Machine Dips Assistée", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/dips-assis-machine-matrix.gif", desc: "Mains sur les poignées, descendez en fléchissant les coudes à 90°." },
+                    { name: "Extension Triceps Poulie Haute à la Corde", sets: 4, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/extension-triceps-poulie-haute-corde.gif", desc: "Coudes collés aux côtes, poussez la corde vers le bas." },
+                    { name: "Curl Biceps Assis à la Machine", sets: 4, reps: "10-12 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-pupitre-machine-prechargee.gif", desc: "Coudes calés sur le pupitre, fléchissez les bras pour contracter les biceps." },
+                    { name: "Crunch à la Machine", sets: 4, reps: "15-20 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/04/crunch-machine-abdos.gif", desc: "Saisissez les poignées et enroulez le buste vers le bas." },
+                    { name: "Extension Lombaire au Banc 45°", sets: 3, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/extension-lombaire-au-banc-45.gif", desc: "Bassin calé, descendez le buste puis remontez à l'horizontale." }
                 ]
             },
             {
@@ -388,26 +400,26 @@
                 warmup: "10 min Vélo",
                 warmupIcon: "fa-solid fa-person-biking",
                 articular: [
-                    { title: "Balancements de jambe (15x)", desc: "Se tenir à un support et balancer une jambe d'avant en arrière souplement." },
-                    { title: "Rotations des chevilles (12x)", desc: "Effectuer des cercles avec chaque pied pour préparer l'articulation." },
-                    { title: "Squats à vide (10x)", desc: "Fléchir les genoux en gardant le dos droit, sans charge, pour lubrifier les genoux." },
-                    { title: "Ouvertures de hanches (10x)", desc: "Monter le genou et l'ouvrir vers l'extérieur en décrivant un cercle." }
+                    { title: "Balancements de jambe (15x)", desc: "Se tenir à un support et balancer une jambe d'avant en arrière." },
+                    { title: "Rotations des chevilles (12x)", desc: "Effectuer des cercles avec chaque pied." },
+                    { title: "Squats à vide (10x)", desc: "Fléchir les genoux en gardant le dos droit, sans charge." },
+                    { title: "Ouvertures de hanches (10x)", desc: "Monter le genou et l'ouvrir vers l'extérieur." }
                 ],
                 stretching: [
-                    { title: "Étirement quadriceps - Jambe droite (30s)", desc: "Debout, attraper la cheville droite pour ramener le talon contre la fesse, genoux serrés." },
-                    { title: "Étirement quadriceps - Jambe gauche (30s)", desc: "Debout, attraper la cheville gauche pour ramener le talon contre la fesse, genoux serrés." },
-                    { title: "Étirement ischio-jambiers - Jambe droite (30s)", desc: "Poser le talon droit sur une surface surélevée, jambe tendue, et incliner le dos droit vers l'avant." },
-                    { title: "Étirement ischio-jambiers - Jambe gauche (30s)", desc: "Poser le talon gauche sur une surface surélevée, jambe tendue, et incliner le dos droit vers l'avant." },
-                    { title: "Étirement fessiers - Côté droit (30s)", desc: "Couché, croiser la cheville droite sur le genou gauche et tirer la cuisse vers soi." },
-                    { title: "Étirement fessiers - Côté gauche (30s)", desc: "Couché, croiser la cheville gauche sur le genou droit et tirer la cuisse vers soi." },
-                    { title: "Étirement adducteurs (papillon assis) (30s)", desc: "Assis, plantes de pieds collées, laisser descendre les genoux vers le sol en se tenant droit." }
+                    { title: "Étirement quadriceps - Jambe droite (30s)", desc: "Attraper la cheville droite pour ramener le talon contre la fesse." },
+                    { title: "Étirement quadriceps - Jambe gauche (30s)", desc: "Attraper la cheville gauche pour ramener le talon contre la fesse." },
+                    { title: "Étirement ischio-jambiers - Jambe droite (30s)", desc: "Poser le talon droit surélevé, jambe tendue, incliner le dos droit." },
+                    { title: "Étirement ischio-jambiers - Jambe gauche (30s)", desc: "Poser le talon gauche surélevé, jambe tendue, incliner le dos droit." },
+                    { title: "Étirement fessiers - Côté droit (30s)", desc: "Croiser la cheville droite sur le genou gauche et tirer la cuisse." },
+                    { title: "Étirement fessiers - Côté gauche (30s)", desc: "Croiser la cheville gauche sur le genou droit et tirer la cuisse." },
+                    { title: "Étirement adducteurs (papillon assis) (30s)", desc: "Plantes de pieds collées, laisser descendre les genoux." }
                 ],
                 exercises: [
-                    { name: "Presse à Cuisses Inclinée", sets: 4, reps: "10-12 reps", restSec: 150, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif", desc: "Pieds placés sur le plateau, poussez par les talons sans verrouiller brutalement les genoux." },
-                    { name: "Leg Extension (Quadriceps)", sets: 4, reps: "12-15 reps", restSec: 90, image: "https://i.pinimg.com/originals/2f/88/8a/2f888a80d3e49f5e31ee372116437540.gif", desc: "Dos bien appuyé au siège, tendez les jambes vers le haut en bloquant 1 seconde en contraction haute." },
-                    { name: "Leg Curl Assis (Ischio-Jambiers)", sets: 4, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/leg-curl-assis-machine.gif", desc: "Fléchissez les genoux pour ramener le boudin sous le siège de façon fluide et contrôlée." },
-                    { name: "Machine Hip Thrust (Fessiers)", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/hip-thrust-machine-leg-extension.gif", desc: "Cible N°1 du grand fessier : poussez le bassin vers le haut en contractant fort les fessiers en haut." },
-                    { name: "Machine Abducteurs", sets: 4, reps: "15-20 reps", restSec: 90, image: "https://i.pinimg.com/originals/a0/85/b9/a085b9cee9496d9f0c9e9aa733479bfb.gif", desc: "Écartez les cuisses contre les coussins pour travailler le haut/côté des fessiers (moyen fessier)." }
+                    { name: "Presse à Cuisses Inclinée", sets: 4, reps: "10-12 reps", restSec: 150, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif", desc: "Pieds sur le plateau, poussez par les talons sans bloquer les genoux." },
+                    { name: "Leg Extension (Quadriceps)", sets: 4, reps: "12-15 reps", restSec: 90, image: "https://i.pinimg.com/originals/2f/88/8a/2f888a80d3e49f5e31ee372116437540.gif", desc: "Dos appuyé, tendez les jambes vers le haut (1s en contraction)." },
+                    { name: "Leg Curl Assis (Ischio-Jambiers)", sets: 4, reps: "12-15 reps", restSec: 90, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/leg-curl-assis-machine.gif", desc: "Fléchissez les genoux pour ramener le boudin sous le siège." },
+                    { name: "Machine Hip Thrust (Fessiers)", sets: 4, reps: "10-12 reps", restSec: 120, image: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/hip-thrust-machine-leg-extension.gif", desc: "Poussez le bassin vers le haut en contractant fort les fessiers." },
+                    { name: "Machine Abducteurs", sets: 4, reps: "15-20 reps", restSec: 90, image: "https://i.pinimg.com/originals/a0/85/b9/a085b9cee9496d9f0c9e9aa733479bfb.gif", desc: "Écartez les cuisses contre les coussins pour cibler le moyen fessier." }
                 ]
             }
         ];
@@ -423,8 +435,8 @@
         let progressChartInstance = null;
         let currentChartMetric = 'weight';
 
-        // Gestion des onglets
         function switchTab(tabName) {
+            triggerHaptic(20);
             const dashScreen = document.getElementById('screen-dashboard');
             const statsScreen = document.getElementById('screen-stats');
             const btnDash = document.getElementById('nav-btn-dashboard');
@@ -482,6 +494,7 @@
         });
 
         function showModal(title, message, iconClass, buttons) {
+            triggerHaptic(30);
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
             document.getElementById('modal-icon').className = iconClass;
@@ -502,6 +515,7 @@
         }
 
         async function startWorkout(index) {
+            triggerHaptic(40);
             activeWorkoutIndex = index;
             const workout = workouts[index];
 
@@ -515,7 +529,6 @@
             document.getElementById('warmup-title').textContent = workout.warmup;
             document.getElementById('warmup-icon').className = workout.warmupIcon;
 
-            // Remplir les listes d'échauffement articulaire
             const artContainer = document.getElementById('articular-list');
             artContainer.innerHTML = workout.articular.map((item) => `
                 <div class="bg-black/60 p-3 rounded-xl border border-cardborder flex items-center justify-between text-slate-300">
@@ -529,7 +542,6 @@
                 </div>
             `).join('');
 
-            // Remplir les étirements finaux
             const stretchContainer = document.getElementById('stretching-list');
             stretchContainer.innerHTML = workout.stretching.map((item) => `
                 <div class="bg-black/60 p-3 rounded-xl border border-cardborder flex items-center justify-between text-slate-300">
@@ -556,13 +568,23 @@
         }
 
         function toggleCheckItemParent(btnElement) {
+            triggerHaptic(20);
             btnElement.classList.toggle('bg-success');
             btnElement.classList.toggle('text-white');
             btnElement.classList.toggle('border-success');
             const parentRow = btnElement.closest('div.bg-black\\/60');
-            if (parentRow) {
-                parentRow.classList.toggle('border-success/50');
-            }
+            if (parentRow) parentRow.classList.toggle('border-success/50');
+        }
+
+        // Calculateur de 1RM estimé (Formule de Brzycki)
+        function calculateEstimated1RM(weight, reps) {
+            if (!weight || weight <= 0 || !reps || reps <= 0) return 0;
+            // Si 1 rep, c'est le poids direct
+            if (reps === 1) return weight;
+            // Formule de Brzycki : 1RM = weight / (1.0278 - 0.0278 * reps)
+            if (reps > 36) reps = 36; // Limite de sécurité formule
+            const estimated = weight / (1.0278 - (0.0278 * reps));
+            return Math.round(estimated);
         }
 
         function renderExerciseCard(ex, exIdx) {
@@ -573,6 +595,14 @@
                 const prevVal = localStorage.getItem(prevValKey) || '--';
                 const prevRpe = localStorage.getItem(prevRpeKey) || '-';
 
+                // Calcul du 1RM estimé basé sur le précédent si disponible (en assumant la fourchette basse des reps ex: 10 reps)
+                let rmDisplay = '';
+                if (prevVal !== '--') {
+                    const numericW = parseFloat(prevVal);
+                    const estimated1RM = calculateEstimated1RM(numericW, 10);
+                    rmDisplay = `<span class="text-[9px] text-accent/90 ml-1">1RM est. ~${estimated1RM}kg</span>`;
+                }
+
                 const restMin = Math.floor(ex.restSec / 60);
                 const restSecRem = ex.restSec % 60;
                 const restFormatted = restSecRem > 0 ? `${restMin}m${restSecRem}s` : `${restMin}m`;
@@ -582,8 +612,8 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-400 w-12">Série ${s}</span>
-                                <span class="text-[10px] text-slate-400 font-mono bg-cardbg px-2 py-0.5 rounded border border-cardborder flex items-center gap-1.5">
-                                    Précédent: <strong class="text-white">${prevVal} kg</strong> <span class="text-warning">(RPE ${prevRpe})</span>
+                                <span class="text-[10px] text-slate-400 font-mono bg-cardbg px-2 py-0.5 rounded border border-cardborder flex items-center gap-1.5 flex-wrap">
+                                    Précédent: <strong class="text-white">${prevVal} kg</strong> <span class="text-warning">(RPE ${prevRpe})</span> ${rmDisplay}
                                 </span>
                             </div>
                             <span class="text-xs font-medium text-slate-300">${ex.reps}</span>
@@ -661,6 +691,7 @@
         }
 
         function toggleWarmupTimer() {
+            triggerHaptic(20);
             const btn = document.getElementById('warmup-start-btn');
             if (warmupTimerInterval) {
                 clearInterval(warmupTimerInterval);
@@ -675,6 +706,7 @@
                     } else {
                         clearInterval(warmupTimerInterval);
                         warmupTimerInterval = null;
+                        triggerHaptic(80);
                         showModal("Échauffement terminé !", "Passez aux mouvements d'échauffement articulaire.", "fa-solid fa-circle-check text-success", [{ label: "Compris !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold" }]);
                     }
                 }, 1000);
@@ -682,6 +714,7 @@
         }
 
         function resetWarmupTimer() {
+            triggerHaptic(20);
             clearInterval(warmupTimerInterval);
             warmupTimerInterval = null;
             warmupSecondsLeft = 600;
@@ -696,6 +729,7 @@
         }
 
         function completeSet(btn, restSec, exIdx, s, restFormatted) {
+            triggerHaptic(40);
             btn.classList.toggle('bg-success');
             btn.classList.toggle('text-white');
             btn.classList.toggle('border-success');
@@ -717,17 +751,20 @@
                     const s = timeLeft % 60;
                     document.getElementById('rest-timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 } else {
+                    triggerHaptic(100);
                     stopRestTimer();
                 }
             }, 1000);
         }
 
         function adjustRestTimer(amount) {
+            triggerHaptic(15);
             restEndTime += (amount * 1000);
             updateRestDisplay();
         }
 
         function stopRestTimer() {
+            triggerHaptic(20);
             clearInterval(restTimerInterval);
             restTimerInterval = null;
             document.getElementById('rest-timer-bar').classList.add('translate-y-full');
@@ -741,7 +778,6 @@
         }
 
         function saveCurrentWeight(exIdx, setNum, value) {
-            // Sauvegarde en direct pour la session en cours mais les inputs ne se rechargent plus au démarrage
             localStorage.setItem(`temp_w_${activeWorkoutIndex}_${exIdx}_${setNum}`, value);
         }
 
@@ -777,6 +813,7 @@
             
             history.push({
                 date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now(),
                 title: workout.title,
                 duration: document.getElementById('global-timer').textContent,
                 avgWeight: parseFloat(avgWeight),
@@ -785,8 +822,6 @@
             });
 
             localStorage.setItem('machine_workout_history', JSON.stringify(history));
-            
-            // Vérification du besoin de rappel de sauvegarde (toutes les 10 séances)
             checkBackupReminder(history.length);
         }
 
@@ -807,6 +842,7 @@
         }
 
         function setChartMetric(metric) {
+            triggerHaptic(20);
             currentChartMetric = metric;
             const btnW = document.getElementById('btn-metric-weight');
             const btnV = document.getElementById('btn-metric-volume');
@@ -820,20 +856,33 @@
             loadStatsAndChart();
         }
 
+        // Calculateur de la semaine en cours (Lundi au Dimanche)
+        function getWeeklySessionCount(history) {
+            const now = new Date();
+            const dayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0=Lundi ... 6=Dimanche
+            const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek).getTime();
+            
+            let count = 0;
+            history.forEach(item => {
+                if (item.timestamp && item.timestamp >= startOfWeek) {
+                    count++;
+                }
+            });
+            return count;
+        }
+
         function loadStatsAndChart() {
             const history = JSON.parse(localStorage.getItem('machine_workout_history') || '[]');
             
             document.getElementById('kpi-total-sessions').textContent = history.length;
+            const weeklyCount = getWeeklySessionCount(history);
+            document.getElementById('kpi-weekly-count').textContent = `${weeklyCount} / 3`;
+
             let absoluteMax = 0;
-            let sumAvg = 0;
             history.forEach(item => {
                 if (item.maxWeight > absoluteMax) absoluteMax = item.maxWeight;
-                sumAvg += item.avgWeight;
             });
-            const globalAvg = history.length > 0 ? (sumAvg / history.length).toFixed(1) : 0;
-
             document.getElementById('kpi-max-weight').textContent = `${absoluteMax} kg`;
-            document.getElementById('kpi-global-avg').textContent = `${globalAvg} kg`;
 
             const historyListEl = document.getElementById('history-list');
             if (history.length === 0) {
@@ -853,9 +902,16 @@
                 `).join('');
             }
 
+            // Filtrage par type de séance pour le graphique
+            const progFilter = document.getElementById('chart-prog-filter').value;
+            let filteredHistory = history;
+            if (progFilter !== 'all') {
+                filteredHistory = history.filter(item => item.title.includes(progFilter));
+            }
+
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const labels = history.map((item, idx) => `S#${idx + 1} (${item.date.split(' ')[0]})`);
-            const data = history.map(item => currentChartMetric === 'weight' ? item.avgWeight : (item.totalVolume || 0));
+            const labels = filteredHistory.map((item, idx) => `S#${idx + 1} (${item.date.split(' ')[0]})`);
+            const data = filteredHistory.map(item => currentChartMetric === 'weight' ? item.avgWeight : (item.totalVolume || 0));
             const labelText = currentChartMetric === 'weight' ? 'Moyenne des poids (kg)' : 'Volume total levé (kg)';
 
             if (progressChartInstance) {
@@ -897,11 +953,11 @@
             });
         }
 
-        // --- GESTION IMPORT / EXPORT JSON (Avec validation stricte et support PWA iOS) ---
         async function exportDataJSON() {
+            triggerHaptic(20);
             const dataToExport = {
                 appIdentifier: "machine_workout_pwa",
-                version: "2.1",
+                version: "2.2",
                 history: JSON.parse(localStorage.getItem('machine_workout_history') || '[]'),
                 localStorageBackup: { ...localStorage },
                 exportDate: new Date().toISOString()
@@ -934,33 +990,29 @@
         }
 
         function importDataJSON(event) {
+            triggerHaptic(20);
             const fileReader = new FileReader();
             if (event.target.files[0]) {
                 fileReader.readAsText(event.target.files[0], "UTF-8");
                 fileReader.onload = function(e) {
                     try {
                         const importedData = JSON.parse(e.target.result);
-                        
-                        // Validation stricte du schéma JSON
                         if (!importedData || typeof importedData !== 'object' || (!importedData.history && !importedData.localStorageBackup)) {
                             throw new Error("Structure de fichier non reconnue.");
                         }
-
                         if (importedData.history && Array.isArray(importedData.history)) {
                             localStorage.setItem('machine_workout_history', JSON.stringify(importedData.history));
                         }
-                        
                         if (importedData.localStorageBackup && typeof importedData.localStorageBackup === 'object') {
                             for (const [key, value] of Object.entries(importedData.localStorageBackup)) {
                                 localStorage.setItem(key, value);
                             }
                         }
-
-                        showModal("Importation réussie", "Vos données et votre historique ont été validés et restaurés avec succès !", "fa-solid fa-circle-check text-success", [
+                        showModal("Importation réussie", "Vos données et votre historique ont été validés et restaurés !", "fa-solid fa-circle-check text-success", [
                             { label: "Parfait !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold", action: loadStatsAndChart }
                         ]);
                     } catch (error) {
-                        showModal("Échec de l'importation", "Le fichier sélectionné est invalide ou corrompu. Aucune donnée n'a été modifiée.", "fa-solid fa-triangle-exclamation text-danger", [
+                        showModal("Échec de l'importation", "Le fichier sélectionné est invalide ou corrompu.", "fa-solid fa-triangle-exclamation text-danger", [
                             { label: "Fermer", class: "bg-cardbg text-slate-300 px-4 py-2 rounded-lg text-xs font-semibold border border-cardborder" }
                         ]);
                     }
@@ -969,6 +1021,7 @@
         }
 
         function clearHistoryData() {
+            triggerHaptic(30);
             showModal("Réinitialiser l'historique ?", "Êtes-vous sûr de vouloir effacer toutes vos données de suivi et statistiques ?", "fa-solid fa-triangle-exclamation text-danger", [
                 { label: "Annuler", class: "bg-cardbg text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold border border-cardborder" },
                 { label: "Effacer", class: "bg-danger text-white px-4 py-2 rounded-lg text-xs font-bold", action: () => {
@@ -979,6 +1032,7 @@
         }
 
         function requestQuitWorkout() {
+            triggerHaptic(30);
             showModal("Quitter la séance ?", "Êtes-vous sûr de vouloir interrompre la séance en cours ?", "fa-solid fa-triangle-exclamation text-warning", [
                 { label: "Annuler", class: "bg-cardbg text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold border border-cardborder" },
                 { label: "Quitter", class: "bg-danger text-white px-4 py-2 rounded-lg text-xs font-bold", action: quitWorkout }
@@ -997,9 +1051,10 @@
         }
 
         function requestFinishWorkout() {
+            triggerHaptic(50);
             persistWorkoutResults();
             const timeStr = document.getElementById('global-timer').textContent;
-            showModal("Félicitations !", `Séance terminée en ${timeStr}. Vos performances ont été enregistrées dans l'historique et le graphique de suivi !`, "fa-solid fa-trophy text-amber-400", [
+            showModal("Félicitations !", `Séance terminée en ${timeStr}. Vos performances ont été enregistrées avec succès !`, "fa-solid fa-trophy text-amber-400", [
                 { label: "Voir le suivi & stats", class: "bg-accent text-white px-4 py-2 rounded-lg text-xs font-bold", action: () => { quitWorkout(); switchTab('stats'); } },
                 { label: "Tableau de bord", class: "bg-cardbg text-slate-300 px-4 py-2 rounded-lg text-xs font-semibold border border-cardborder", action: quitWorkout }
             ]);
