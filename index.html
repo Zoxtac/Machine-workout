@@ -551,7 +551,6 @@
             const container = document.getElementById('exercises-container');
             container.innerHTML = workout.exercises.map((ex, exIdx) => renderExerciseCard(ex, exIdx)).join('');
 
-            loadSavedData();
             startGlobalTimer();
             await requestWakeLock();
         }
@@ -598,7 +597,7 @@
                             <div class="flex items-center gap-1 bg-cardbg px-2 py-1 rounded-lg border border-cardborder">
                                 <span class="text-[10px] text-slate-400 font-bold">RPE</span>
                                 <select id="rpe_${exIdx}_${s}" onchange="saveCurrentRPE(${exIdx}, ${s}, this.value)" class="bg-transparent text-xs text-warning font-bold focus:outline-none cursor-pointer">
-                                    <option value="" class="bg-cardbg text-slate-400">-</option>
+                                    <option value="" class="bg-cardbg text-slate-400" selected>-</option>
                                     <option value="6" class="bg-cardbg text-emerald-400">6 (Facile)</option>
                                     <option value="7" class="bg-cardbg text-emerald-400">7 (Modéré)</option>
                                     <option value="8" class="bg-cardbg text-warning">8 (Bon effort)</option>
@@ -742,29 +741,12 @@
         }
 
         function saveCurrentWeight(exIdx, setNum, value) {
+            // Sauvegarde en direct pour la session en cours mais les inputs ne se rechargent plus au démarrage
             localStorage.setItem(`temp_w_${activeWorkoutIndex}_${exIdx}_${setNum}`, value);
         }
 
         function saveCurrentRPE(exIdx, setNum, value) {
             localStorage.setItem(`temp_rpe_${activeWorkoutIndex}_${exIdx}_${setNum}`, value);
-        }
-
-        function loadSavedData() {
-            const workout = workouts[activeWorkoutIndex];
-            workout.exercises.forEach((ex, exIdx) => {
-                for (let s = 1; s <= ex.sets; s++) {
-                    const savedW = localStorage.getItem(`temp_w_${activeWorkoutIndex}_${exIdx}_${s}`);
-                    if (savedW) {
-                        const input = document.getElementById(`w_${exIdx}_${s}`);
-                        if (input) input.value = savedW;
-                    }
-                    const savedRpe = localStorage.getItem(`temp_rpe_${activeWorkoutIndex}_${exIdx}_${s}`);
-                    if (savedRpe) {
-                        const select = document.getElementById(`rpe_${exIdx}_${s}`);
-                        if (select) select.value = savedRpe;
-                    }
-                }
-            });
         }
 
         function persistWorkoutResults() {
@@ -919,7 +901,7 @@
         async function exportDataJSON() {
             const dataToExport = {
                 appIdentifier: "machine_workout_pwa",
-                version: "2.0",
+                version: "2.1",
                 history: JSON.parse(localStorage.getItem('machine_workout_history') || '[]'),
                 localStorageBackup: { ...localStorage },
                 exportDate: new Date().toISOString()
