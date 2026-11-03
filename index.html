@@ -93,7 +93,7 @@
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-center">
                 <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Programme d'entraînement</p>
                 <h2 class="text-xl font-bold text-white mt-1">Sélectionnez votre séance du jour</h2>
-                <p class="text-xs text-slate-400 mt-1">100% Local • Stocké sur l'appareil • Repos 2m / 3m</p>
+                <p class="text-xs text-slate-400 mt-1">100% Hors-ligne • GIFs & Données en cache local</p>
             </div>
 
             <div class="grid gap-4">
@@ -156,12 +156,23 @@
             </div>
         </div>
 
-        <!-- ECRAN STATS / SUIVI AMÉLIORÉ -->
+        <!-- ECRAN STATS / SUIVI AMÉLIORÉ AVEC IMPORT/EXPORT -->
         <div id="screen-stats" class="hidden space-y-6">
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-center">
                 <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Analyse de progression</p>
                 <h2 class="text-xl font-bold text-white mt-1">Suivi de vos performances</h2>
-                <p class="text-xs text-slate-400 mt-1">Vue d'ensemble de vos efforts et statistiques globales</p>
+                <p class="text-xs text-slate-400 mt-1">Vue d'ensemble et gestion des données</p>
+            </div>
+
+            <!-- BOUTONS IMPORT / EXPORT JSON -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="exportDataJSON()" class="bg-cardbg hover:bg-slate-800 border border-slate-700 text-slate-200 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow">
+                    <i class="fa-solid fa-file-arrow-down text-accent"></i> Exporter (JSON)
+                </button>
+                <label class="bg-cardbg hover:bg-slate-800 border border-slate-700 text-slate-200 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow cursor-pointer">
+                    <i class="fa-solid fa-file-arrow-up text-success"></i> Importer (JSON)
+                    <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden">
+                </label>
             </div>
 
             <!-- GRILLES DE STATS / KPIS -->
@@ -307,12 +318,12 @@
 
     <!-- SCRIPT APPLICATION ET ENREGISTREMENT DU SERVICE WORKER -->
     <script>
-        // Enregistrement du Service Worker pour un fonctionnement 100% hors-ligne
+        // Enregistrement du Service Worker avec gestion du timeout réseau (10 sec max)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker enregistré avec succès !', reg.scope))
-                    .catch(err => console.log('Échec de l\'enregistrement du Service Worker :', err));
+                    .then(reg => console.log('Service Worker enregistré !', reg.scope))
+                    .catch(err => console.log('Erreur SW :', err));
             });
         }
 
@@ -800,7 +811,6 @@
         function loadStatsAndChart() {
             const history = JSON.parse(localStorage.getItem('machine_workout_history') || '[]');
             
-            // Calcul des KPIs
             document.getElementById('kpi-total-sessions').textContent = history.length;
             let absoluteMax = 0;
             let sumAvg = 0;
@@ -813,7 +823,6 @@
             document.getElementById('kpi-max-weight').textContent = `${absoluteMax} kg`;
             document.getElementById('kpi-global-avg').textContent = `${globalAvg} kg`;
 
-            // Remplir l'historique visuel détaillé
             const historyListEl = document.getElementById('history-list');
             if (history.length === 0) {
                 historyListEl.innerHTML = `<p class="text-slate-500 text-center py-4">Aucune séance enregistrée pour le moment.</p>`;
@@ -832,7 +841,6 @@
                 `).join('');
             }
 
-            // Générer le graphique Chart.js avec la métrique choisie
             const ctx = document.getElementById('progressChart').getContext('2d');
             const labels = history.map((item, idx) => `S#${idx + 1} (${item.date.split(' ')[0]})`);
             const data = history.map(item => currentChartMetric === 'weight' ? item.avgWeight : (item.totalVolume || 0));
@@ -875,6 +883,49 @@
                     }
                 }
             });
+        }
+
+        // --- GESTION IMPORT / EXPORT JSON ---
+        function exportDataJSON() {
+            const dataToExport = {
+                history: JSON.parse(localStorage.getItem('machine_workout_history') || '[]'),
+                localStorageBackup: { ...localStorage },
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `machine_workout_backup_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importDataJSON(event) {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        if (importedData.history) {
+                            localStorage.setItem('machine_workout_history', JSON.stringify(importedData.history));
+                        }
+                        if (importedData.localStorageBackup) {
+                            for (const [key, value] of Object.entries(importedData.localStorageBackup)) {
+                                localStorage.setItem(key, value);
+                            }
+                        }
+                        showModal("Importation réussie", "Vos données et votre historique ont bien été restaurés !", "fa-solid fa-circle-check text-success", [
+                            { label: "Parfait !", class: "bg-success text-white px-4 py-2 rounded-lg text-xs font-bold", action: loadStatsAndChart }
+                        ]);
+                    } catch (error) {
+                        showModal("Erreur", "Le fichier JSON est invalide ou corrompu.", "fa-solid fa-triangle-exclamation text-danger", [
+                            { label: "Fermer", class: "bg-slate-800 text-slate-300 px-4 py-2 rounded-lg text-xs font-semibold" }
+                        ]);
+                    }
+                };
+            }
         }
 
         function clearHistoryData() {
